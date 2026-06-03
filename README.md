@@ -72,8 +72,13 @@ pip install numpy pandas pulp scikit-learn python-dateutil
 
 # Install optional dependencies (recommended)
 pip install tensorflow prophet xgboost shap
+```
 
- Quick Start
+---
+
+## ▶️ Quick Start
+
+```python
 import asyncio
 from apex_bems import BEMSConfig, MPController, main_services
 
@@ -85,18 +90,23 @@ async def run():
         market='ERCOT',
         products=['energy', 'reg_up', 'reg_down', 'spin']
     )
-    
+
     # Initialize services and controller
     mpc = main_services(cfg)
-    
+
     # Run simulation steps
     for step in range(100):
         plan = await mpc.step()
         print(f"Dispatch: {plan.action_kw:.1f} kW — {plan.reason}")
 
 asyncio.run(run())
+```
 
-Architecture
+---
+
+## 🏗️ Architecture
+
+```
 ┌─────────────────────────────────────────────────────┐
 │                    Event Bus                         │
 ├──────────┬──────────┬──────────┬──────────┬─────────┤
@@ -108,62 +118,70 @@ Architecture
 ├─────────────────────────────────────────────────────┤
 │    Policy Validator    │    Audit Logger (SQLite)    │
 └─────────────────────────────────────────────────────┘
+```
 
-Component Overview
+### Component Overview
 
-Component	Responsibility
-ForecasterService	Multi-model ensemble prediction, VAE scenario generation
-OptimizationService	Multi-market stochastic optimization, parametric bid curves
-BatteryStateService	State tracking, SOS2 degradation costs, temperature effects
-MonitoringService	Drift detection, horizon adjustment, exploration triggering
-MarketAPIClient	Market data retrieval, bid submission with retry logic
-PolicyValidator	Pre-submission bid feasibility checks
-AuditLogger	Structured dispatch logging with explainability metadata
-EventBus	Decoupled inter-component communication
+| Component | Responsibility |
+|---|---|
+| `ForecasterService` | Multi-model ensemble prediction, VAE scenario generation |
+| `OptimizationService` | Multi-market stochastic optimization, parametric bid curves |
+| `BatteryStateService` | State tracking, SOS2 degradation costs, temperature effects |
+| `MonitoringService` | Drift detection, horizon adjustment, exploration triggering |
+| `MarketAPIClient` | Market data retrieval, bid submission with retry logic |
+| `PolicyValidator` | Pre-submission bid feasibility checks |
+| `AuditLogger` | Structured dispatch logging with explainability metadata |
+| `EventBus` | Decoupled inter-component communication |
 
-Configuration
+---
 
-Key configuration parameters in BEMSConfig:
-Parameter	Default	Description
-capacity_kwh	1000.0	Battery energy capacity
-max_power_kw	250.0	Maximum charge/discharge power
-horizon_hours	4	Optimization horizon
-max_scenarios	100	Monte Carlo scenarios
-solver	'CBC'	Optimization solver (CBC/Gurobi/CPLEX/HiGHS)
-bid_price_tiers	10	Parametric sweep granularity
-confidence	0.95	Risk-adjusted optimization
-drift_mae_sigma	1.5	Drift detection sensitivity
+## 🔧 Configuration
 
-Output & Logging
-Dispatch Log (SQLite)
+Key configuration parameters in `BEMSConfig`:
+
+| Parameter | Default | Description |
+|---|---|---|
+| `capacity_kwh` | `1000.0` | Battery energy capacity |
+| `max_power_kw` | `250.0` | Maximum charge/discharge power |
+| `horizon_hours` | `4` | Optimization horizon |
+| `max_scenarios` | `100` | Monte Carlo scenarios |
+| `solver` | `'CBC'` | Optimization solver (CBC/Gurobi/CPLEX/HiGHS) |
+| `bid_price_tiers` | `10` | Parametric sweep granularity |
+| `confidence` | `0.95` | Risk-adjusted optimization |
+| `drift_mae_sigma` | `1.5` | Drift detection sensitivity |
+
+---
+
+## 📊 Output & Logging
+
+### Dispatch Log (SQLite)
 
 Each dispatch decision is logged with:
+- Timestamp, action (kW), state of charge
+- Active shadow prices and constraints
+- Top SHAP feature importances
+- Submitted bid curve
+- Battery health metrics (temperature, cycle count)
 
-    Timestamp, action (kW), state of charge
+### Bottleneck Analysis
 
-    Active shadow prices and constraints
-
-    Top SHAP feature importances
-
-    Submitted bid curve
-
-    Battery health metrics (temperature, cycle count)
-
-Bottleneck Analysis
+```python
 # Get top constraints limiting revenue
 bottlenecks = audit.get_bottlenecks(limit=5)
 print(bottlenecks)
 # [('soc_max_t3', 45.2), ('ramp_up_t7', 32.1), ...]
+```
 
-Real-time Monitoring
+### Real-time Monitoring
+- Drift alerts when prediction MAE exceeds threshold
+- Automatic model retraining triggers
+- Horizon adjustment based on volatility regime
 
-    Drift alerts when prediction MAE exceeds threshold
+---
 
-    Automatic model retraining triggers
+## 🧪 Testing
 
-    Horizon adjustment based on volatility regime
-
-Testing
+```bash
 # Run with simulated market data
 python apex_bems.py
 
@@ -172,70 +190,80 @@ python apex_bems.py --log-level DEBUG
 
 # Specify solver
 python apex_bems.py --solver GUROBI --time-limit 60
+```
 
-Performance Optimizations
+---
 
-    Solver Selection: Use commercial solvers (Gurobi/CPLEX) for large-scale problems
+## ⚡ Performance Optimizations
 
-    Scenario Reduction: Adjust max_scenarios based on computational budget
+- **Solver Selection** — Use commercial solvers (Gurobi/CPLEX) for large-scale problems
+- **Scenario Reduction** — Adjust `max_scenarios` based on computational budget
+- **Incremental Training** — Models retrain only on schedule or drift detection
+- **Persistent State** — Minimizes cold-start delays after restarts
 
-    Incremental Training: Models retrain only on schedule or drift detection
+---
 
-    Persistent State: Minimizes cold-start delays after restarts
+## 🔬 Advanced Features
 
- Advanced Features
-Custom Ensemble Weights
+### Custom Ensemble Weights
 
-# For commercial solver support (optional)
-# Gurobi: Follow Gurobi installation guide
-# CPLEX: Follow IBM CPLEX installation guide
-
+```python
 forecaster.ensemble.weights = {'lstm': 0.5, 'prophet': 0.2, 'xgb': 0.3}
 forecaster.ensemble.temperature = 0.1  # Sharper weight distribution
+```
 
-Multi-Bandit Exploration
-python
+### Multi-Bandit Exploration
 
+```python
 cfg.exploration_prob = 0.15  # 15% chance to explore alternative strategies
+```
 
-Temperature-Dependent Degradation
-python
+### Temperature-Dependent Degradation
 
+```python
 cfg.activation_energy_ev = 0.5  # Arrhenius model parameter
 cfg.temperature_ref = 25.0      # Reference temperature (°C)
+```
 
- Reference
+### Commercial Solver Support
+
+```bash
+# Gurobi: Follow Gurobi installation guide
+# CPLEX: Follow IBM CPLEX installation guide
+```
+
+---
+
+## 📚 Reference
 
 The system implements state-of-the-art techniques from:
+- **Stochastic Dual Dynamic Programming** for multi-stage optimization
+- **Bayesian Model Averaging** for ensemble forecasting
+- **Shapley Additive Explanations** for dispatch explainability
+- **Arrhenius Degradation Models** for battery health tracking
 
-    Stochastic Dual Dynamic Programming for multi-stage optimization
+---
 
-    Bayesian Model Averaging for ensemble forecasting
+## 📄 License
 
-    Shapley Additive Explanations for dispatch explainability
+MIT License — See [LICENSE](LICENSE) for details.
 
-    Arrhenius Degradation Models for battery health tracking
+---
 
- License
-
-MIT License — See LICENSE for details.
- Contributing
+## 🤝 Contributing
 
 Contributions welcome! Areas of interest:
+- Additional market product support
+- Alternative forecasting architectures
+- Hardware-in-the-loop integration
+- Real market API connectors
 
-    Additional market product support
+---
 
-    Alternative forecasting architectures
+## 📬 Contact
 
-    Hardware-in-the-loop integration
+For questions or commercial licensing, contact [emiliano.arlington@gmail.com](mailto:emiliano.arlington@gmail.com) or [coma.retained@gmail.com](mailto:coma.retained@gmail.com)
 
-    Real market API connectors
+---
 
- Contact
-
-For questions or commercial licensing, contact emiliano.arlington@gmail.com, coma.retained@gmail.com
-
-Built for production energy trading operations with explainability and regulatory compliance as first-class requirements.
-
-
-
+> Built for production energy trading operations with explainability and regulatory compliance as first-class requirements.
