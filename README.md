@@ -2,10 +2,10 @@ ApexBEMS v7.0
 Fully Autonomous • Explainable • Market‑Ready Energy Management System
 
 ApexBEMS is a production‑grade EMS that autonomously optimizes grid‑scale batteries, compute loads (Bitcoin/AI), and generation assets.
-It is the only platform combining stochastic MPC, native multi‑asset optimization, explainable AI, and autonomous market bidding in a single unified system.
+It is the only platform that unifies stochastic MPC, native multi‑asset optimization, explainable AI, and autonomous market bidding into a single, coherent system.
 
 Enterprise licensing and site‑specific deployments available.  
-Request access
+Use Request Access to begin evaluation.
 🚀 Key Features
 Core Capabilities
 
@@ -13,15 +13,15 @@ Core Capabilities
 
     Multi‑Asset Orchestration — Unified control for batteries, flexible compute loads (ASICs/GPUs), and generators.
 
-    SOS2 Degradation Modeling — Exact piecewise‑linear cost curves for battery health.
+    SOS2 Degradation Modeling — Exact piecewise‑linear cost curves for battery health and lifecycle protection.
 
-    Explainable Dispatch — Per‑dispatch SHAP feature importance + shadow‑price audit logs.
+    Explainable Dispatch — Per‑dispatch SHAP feature importance and shadow‑price audit logs.
 
-    Autonomous Bidding — Parametric bid‑curve generation directly from the MPC engine.
+    Autonomous Bidding — Parametric bid curves generated directly from the MPC engine.
 
     Event‑Driven Architecture — Sub‑second load modulation via asynchronous EventBus.
 
-    Policy Validation — Pre‑submission feasibility checks for safe hardware operation.
+    Policy Validation — Pre‑submission feasibility checks to ensure safe hardware operation.
 
 Forecasting & Intelligence
 
@@ -33,7 +33,7 @@ Forecasting & Intelligence
 
 Auditing & Compliance
 
-    Structured Ledger — SQLite audit logs capturing state, shadow prices, and decision rationale.
+    Structured Ledger — SQLite‑backed audit logs capturing state, shadow prices, and decision rationale.
 
     Bottleneck Analysis — Real‑time identification of limiting constraints (SOC, thermal, ramping).
 
@@ -56,10 +56,10 @@ Code
 📋 Target Use Cases
 Grid‑Scale Storage Operators
 
-Maximize revenue via arbitrage, regulation, and multi‑market stacking.
+Maximize revenue through intelligent arbitrage, regulation, and multi‑market stacking.
 Compute Facilities (Bitcoin / AI)
 
-Turn data centers into grid‑stabilizing assets with sub‑second compute modulation.
+Transform data centers into grid‑stabilizing assets with sub‑second compute modulation.
 Regulated Entities
 
 Maintain audit‑ready decision trails for all algorithmic market participation.
@@ -98,9 +98,9 @@ ApexBEMS implements state‑of‑the‑art methods from:
 MIT License — see LICENSE for details.
 📬 Contact
 
-To request access, provide site details + technical objectives:
+To request access, provide site details and technical objectives:
 
 Primary: emiliano.arlington@gmail.com
 Secondary: coma.retained@gmail.com
 
-Built for production energy trading, with explainability and regulatory compliance as first‑class requirements.
+ApexBEMS is built for production energy trading, with explainability and regulatory compliance as first‑class requirements.
