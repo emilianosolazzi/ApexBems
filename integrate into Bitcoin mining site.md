@@ -1,55 +1,55 @@
-Integration Architecture — Bitcoin Mining + ApexBEMS
+Integration architecture — Bitcoin mining + ApexBEMS
 
-A Bitcoin mining site has three layers. Integration means connecting them with deterministic control flowing top to bottom, telemetry flowing bottom to top.
+A Bitcoin mining site has three layers. Integration means deterministic control flowing top → bottom, telemetry flowing bottom → top.
 
-Layer A — Physical Assets
+Layer A — Physical assets  
 ASICs, switchgear, battery system (PCS + BMS), site transformer, utility and internal metering.
 
-Layer B — Control Plane
-Miner management (LuxOS, Foreman, custom RPC), ApexBEMS as the battery EMS, site SCADA (Modbus/BACnet), telemetry ingestion pipeline.
+Layer B — Control plane  
+Miner management (LuxOS, Foreman, custom RPC), ApexBEMS as the battery + site EMS, site SCADA (Modbus/BACnet), telemetry ingestion pipeline.
 
-Layer C — Market & Optimization
-ApexBEMS MPC engine, ensemble forecasting, bid curve generator, market API connectors (ERCOT, PJM, ISO-NE, CAISO).
+Layer C — Market & optimization  
+ApexBEMS MPC engine, ensemble forecasting, bid curve generator, market API connectors (ERCOT, PJM, ISO‑NE, CAISO).
 
-Integration is simple: Layer C decides, Layer B executes, Layer A responds.
-The Integration Pipeline — Step by Step
-Step 1 — Expose Mining Load as a Controllable Variable
+Integration rule: Layer C decides, Layer B executes, Layer A responds.
+The integration pipeline — step by step
+Step 1 — Expose mining load as a controllable variable
 
 ApexBEMS needs a single control handle:
 text
 
-P_mine(t) = site mining power in kW
+P_MINE(t) = site mining power in kW
 
-This is surfaced through Foreman API, LuxOS RPC, or direct ASIC frequency/voltage control. ApexBEMS sends commands like:
+Surfaced via Foreman API, LuxOS RPC, or direct ASIC frequency/voltage control. ApexBEMS issues commands like:
 
-    "Increase load by 3 MW"
+    “Increase load by 3 MW”
 
-    "Curtail to 0 MW for 5 minutes"
+    “Curtail to 0 MW for 5 minutes”
 
-    *"Ramp down 20% for regulation-up headroom"*
+    “Ramp down 20% for regulation‑up headroom”
 
-If ApexBEMS can't talk directly to the miners, integration stops here. This is non-negotiable.
-Step 2 — Add Mining Load to the MPC Optimization
+If ApexBEMS cannot directly command mining load, integration stops here. This is non‑negotiable.
+Step 2 — Add mining load to the MPC optimization
 
-Inside the optimization model, add:
+Introduce a mining decision variable:
 text
 
 P_MINE[t] ∈ [0, P_MINE_MAX]
 
-And extend the site power balance:
+Extend the site power balance:
 text
 
 P_GRID[t] = P_BATT[t] + P_MINE[t]
 
-Now the solver can simultaneously decide: mine, charge, discharge, curtail, and provide ancillary services — all in one unified problem. No separate control loops fighting each other.
-Step 3 — Price Mining Economics into the Objective Function
+Now the solver can jointly decide: mining, charging, discharging, curtailment, and ancillary provision in one optimization problem—no competing control loops.
+Step 3 — Price mining economics into the objective function
 
-Mining profitability decomposes to a single marginal value per kWh:
+Reduce mining economics to a marginal value per kWh:
 text
 
 value_per_kwh = (BTC_price × sats_per_kwh) − energy_cost_per_kwh
 
-The ApexBEMS objective becomes:
+Update the ApexBEMS objective:
 text
 
 maximize Σₜ [
@@ -59,33 +59,36 @@ maximize Σₜ [
   − imbalance_penalties(t)
 ]
 
-This is the critical step. Without it, ApexBEMS treats mining as background load. With it, mining becomes a price-responsive flexible asset that the optimizer can trade against battery dispatch and market signals.
-Step 4 — Wire ApexBEMS to the Miner Control API
+Without this, mining is just background load. With it, mining becomes a price‑responsive flexible asset traded against battery dispatch and market signals.
+Step 4 — Wire ApexBEMS to the miner control API
 
-ApexBEMS already has an EventBus. Add a subscriber:
+Use the existing EventBus and add a subscriber:
 text
 
 event_type = "dispatch_decision"
 callback  = send_to_miner_manager
 
-The callback translates P_MINE[t] into ASIC frequency commands, pool-side throttle signals, or miner-manager group instructions. Stateless, deterministic, single-direction. No polling. No state reconciliation.
-Step 5 — Wire ApexBEMS to the Battery PCS
+The callback maps P_MINE[t] into ASIC frequency commands, pool‑side throttles, or miner‑manager group instructions. Stateless, deterministic, one‑way: no polling, no state reconciliation.
+Step 5 — Wire ApexBEMS to the battery PCS
 
-Most PCS systems speak Modbus TCP, SunSpec, CAN-to-TCP gateways, or vendor REST APIs. Map P_BATT[t] to charge/discharge setpoints.
+Most PCS systems speak Modbus TCP, SunSpec, CAN‑to‑TCP, or vendor REST APIs. Map:
+text
 
-ApexBEMS already handles SOC tracking, temperature, degradation (SOS2), and cost curves. The PCS just needs to obey.
-Step 6 — Connect to the ISO Market
+P_BATT[t] → charge/discharge setpoints
 
-ApexBEMS ships with a bid curve generator, policy validator, market API client, retry logic, and imbalance penalty modeling. Configure:
+ApexBEMS already handles SOC, temperature, SOS2 degradation, and cost curves. The PCS only needs to follow setpoints.
+Step 6 — Connect to the ISO market
+
+Configure the built‑in market stack:
 text
 
 market   = "ERCOT"
 products = ["energy", "reg_up", "reg_down", "spin"]
 
-Mining + battery becomes a single market-participating VPP. No external coordination layer required.
-Step 7 — Feed Mining Telemetry into the Forecasters
+ApexBEMS uses its bid curve generator, PolicyValidator, market client, retry logic, and imbalance modeling. Mining + battery operate as a single VPP, no extra coordination layer.
+Step 7 — Feed mining telemetry into the forecasters
 
-Give ApexBEMS real-time streams of:
+Provide real‑time streams of:
 
     Hashrate
 
@@ -99,21 +102,21 @@ Give ApexBEMS real-time streams of:
 
     Transaction fee rate
 
-These features sharpen curtailment decisions, mining-vs-arbitrage tradeoffs, and volatility-aware horizon adjustment. The ensemble already knows how to consume them.
-What This Unlocks
-Mining becomes a grid service
+These features sharpen curtailment, mining‑vs‑arbitrage decisions, and volatility‑aware horizon adjustment. The ensemble forecaster can consume them directly.
+What this unlocks
 
-Frequency regulation, ramping reserves, congestion relief, real-time balancing. The same ASICs that secure the network now stabilize the grid.
-Battery + mining = maximum arbitrage
+Mining becomes a grid service  
+Frequency regulation, ramping reserves, congestion relief, real‑time balancing—the same ASICs that secure Bitcoin now stabilize the grid.
 
-The optimizer continuously selects the highest-value combination: mine when cheap, discharge when expensive, curtail at negative prices, charge before volatility, sell flexibility into ancillary markets. This is energy trading with ASICs attached.
-Mining becomes anti-fragile
+Battery + mining = maximum arbitrage  
+The optimizer continuously selects the highest‑value mix: mine when cheap, discharge when expensive, curtail at negative prices, charge ahead of volatility, sell flexibility into ancillary markets. This is energy trading with ASICs attached.
 
-ApexBEMS predicts volatility, adapts its horizon, logs shadow prices, explains its decisions, persists state across restarts, and recovers from corruption. Operations don't break on edge cases. They adapt.
-Integration Checklist
+Mining becomes anti‑fragile  
+ApexBEMS predicts volatility, adapts its horizon, logs shadow prices, explains decisions, persists state, and recovers from corruption. Operations don’t break on edge cases—they adapt.
+Integration checklist
 text
 
-☐ Expose P_mine(t) as a controllable variable
+☐ Expose P_MINE(t) as a controllable variable
 ☐ Add P_MINE[t] to the MPC model and power balance
 ☐ Add mining marginal value to the objective function
 ☐ Connect miner manager to EventBus ("dispatch_decision")
@@ -123,4 +126,3 @@ text
 ☐ Validate all bids through PolicyValidator
 ☐ Run MPC loop at 5-minute cadence
 ☐ Verify shadow prices reflect mining opportunity cost
-
