@@ -1,196 +1,345 @@
-**ApexBEMS — Beyond Batteries. Beyond Mining.
+# ApexBEMS Capabilities Beyond Bitcoin Mining
 
-A Fully Autonomous, Market‑Aware, Multi‑Asset Optimization Engine**
+ApexBEMS is not limited to Bitcoin mining. Its current verified core is a safety-gated shadow-mode optimization pattern for sites that can shift, store, produce, or curtail energy based on market conditions.
 
-ApexBEMS is not a battery controller.
-It is a general‑purpose orchestration layer for any flexible load, generator, or storage system.
-If it consumes, produces, or shifts energy — ApexBEMS can optimize it.
-1. Data Centers (AI, HPC, Cloud)
+This document describes target applications. Some require adapters, signed dry-run command outputs, site telemetry replay, and optimizer extensions that are not yet implemented in the current repository.
 
-Controllable assets: server power caps, GPU throttling, workload shifting, thermal‑aware dispatch, UPS + battery integration.
+Current verified claim:
 
-What it unlocks:
+> ApexBEMS is a test-covered, public-data benchmarked, shadow-mode energy optimization engine with safety-gated dispatch recommendations and replayable audit logs.
 
-    Peak demand charge reduction
+## Best Current Fit
 
-    Demand response participation
+The current implementation is closest to:
 
-    Compute shifted to low‑price intervals
+1. Utility-scale or behind-the-meter battery storage shadow-mode analysis.
+2. Bitcoin or AI compute sites with battery storage and price-sensitive load.
+3. Public-data or historical-data dispatch benchmarking.
+4. Operator-reviewable recommendation systems where control writes are disabled by default.
 
-    Idle UPS capacity monetized
+Other sectors are valid extension targets, but they require asset-specific telemetry adapters, command schemas, and optimization constraints.
 
-    Frequency regulation capability
+## Application Readiness
 
-Same arbitrage logic as mining — applied to AI compute.
-2. EV Fleets & Charging Depots
+| Sector | Current Readiness | Reason |
+|---|---:|---|
+| Battery storage | High | Core optimizer, SOC safety, degradation model, benchmark, audit logs |
+| Bitcoin mining + storage | Medium-high | Mining break-even proxy exists; miner control not yet integrated |
+| AI/HPC data centers | Medium | Flexible-load pattern applies; workload and SLA adapters needed |
+| EV fleets | Medium | Strong fit; OCPP and vehicle readiness constraints needed |
+| Renewable hybrid sites | Medium | Battery optimizer applies; generation forecasts and market bid adapters needed |
+| Commercial buildings | Medium-low | Needs BMS/BACnet adapter and comfort constraints |
+| Industrial loads | Medium-low | Needs process-specific constraints and safety interlocks |
+| Hydrogen / Power-to-X | Medium-low | Needs electrolyzer model, tank constraints, offtake economics |
+| VPP aggregators | Medium-low | Needs fleet aggregation, per-device safety, settlement integration |
 
-Controllable assets: fleet charging schedules, depot load shaping, V2G dispatch, charger throttling, route‑aware planning.
+## Current Core Capabilities
 
-What it unlocks:
+Implemented in the repository today:
 
-    Charging cost minimization
+- Battery-aware storage dispatch optimization with SOC safety checks and replayable audit context.
+- Scenario-based price inputs.
+- Bid curve generation.
+- Policy validation.
+- SafetyGateway dispatch validation.
+- Shadow-mode defaults.
+- Market submission blocked by default.
+- Battery state persistence.
+- SQLite audit logging with replayable decision context.
+- Metrics counters for optimizer success/failure, safe fallback, SOC clipping, and SOC violations.
+- EventBus integration point.
+- Forecasting wrappers for LSTM, Prophet, and XGBoost.
+- Modular `apex_bems` package beside the preserved `ApexBEMS.py` monolith.
+- JSON Schema contracts and schema validation helpers for telemetry and commands.
+- Public ERCOT/Bitcoin benchmark artifacts under `reports/`.
+- Pytest coverage for core behavior, public benchmark mechanics, production hardening, schema contracts, and legacy-vs-modular parity.
 
-    Transformer overload prevention
+Current validation snapshot:
 
-    Grid‑flexibility revenue
+- Pytest: `79 passed`.
+- Public benchmark: `66` ERCOT `hbHubAvg` real-time intervals.
+- Optimizer success rate: `100.00%`.
+- Optimizer failures: `0`.
+- Safe fallback intervals: `0`.
+- SOC violations before clipping: `0`.
 
-    Solar + storage coordination
+## Reusable Pattern
 
-    Fleet readiness optimization
+For each asset class, the integration pattern is:
 
-3. Renewable Plants (Solar, Wind, Hybrid)
+1. Define telemetry schema.
+2. Define command schema.
+3. Convert telemetry into optimizer state.
+4. Add the asset decision variable.
+5. Add economic value and constraints to the objective.
+6. Validate recommendations through `SafetyGateway` and policy checks.
+7. Emit signed dry-run commands in shadow mode.
+8. Audit every decision and command artifact.
+9. Activate live control only after site-specific replay, hardware-in-the-loop validation, and staged operator approval.
 
-Controllable assets: solar + storage hybrids, wind + storage, curtailment logic, forecast‑driven bidding.
+## Claims Not Yet Supported
 
-What it unlocks:
+Do not describe the current repository as:
 
-    PPA revenue maximization
+- A production autonomous controller.
+- A certified ISO bidding platform.
+- A fully co-optimized battery-mining controller.
+- A live PCS or miner control system.
+- A completed VPP platform.
 
-    Imbalance penalty reduction
+Those are future integration targets. The current verified product is a safety-gated shadow-mode optimization foundation.
 
-    Optimal storage cycling
+## 1. AI, HPC, and Cloud Data Centers
 
-    ISO‑compliant bid curves
+Target controllable assets:
 
-    Higher forecast accuracy
+- Server power caps.
+- GPU throttling.
+- Workload scheduling.
+- Cooling setpoints.
+- UPS and battery integration.
 
-4. Microgrids & Campus Energy Systems
+Potential value:
 
-Controllable assets: CHP, diesel gensets, solar, battery, HVAC, thermal storage.
+- Shift flexible compute to low-price intervals.
+- Reduce demand charges.
+- Use UPS or BESS capacity for market participation.
+- Reduce cooling load during price spikes.
 
-What it unlocks:
+Implementation needed:
 
-    Islanding optimization
+- Kubernetes, Slurm, Ray, or vendor-specific power-management adapter.
+- Compute workload value model.
+- Thermal and SLA constraints.
+- Signed dry-run power-cap recommendations before live workload control.
 
-    Resilience planning
+## 2. EV Fleets and Charging Depots
 
-    Peak shaving
+Target controllable assets:
 
-    Tariff arbitrage
+- Charger setpoints.
+- Fleet charging windows.
+- V2G dispatch where available.
+- Depot battery and solar systems.
 
-    Carbon‑aware dispatch
+Potential value:
 
-5. Industrial Loads (Manufacturing, Cold Storage, Chemical)
+- Charging cost minimization.
+- Transformer overload prevention.
+- Fleet readiness guarantees.
+- Grid flexibility revenue.
 
-Controllable assets: batch processes, refrigeration cycles, thermal inertia, pumps/drives, compressed air.
+Implementation needed:
 
-What it unlocks:
+- Charger/OCPP adapter.
+- Vehicle availability and departure forecast.
+- Minimum state-of-charge constraints by vehicle group.
+- Site transformer and feeder constraints from real telemetry.
 
-    Production shifted to low‑price hours
+## 3. Renewable Plants and Hybrid Sites
 
-    Flexibility monetization
+Target controllable assets:
 
-    Demand charge reduction
+- Solar and wind curtailment.
+- Battery dispatch.
+- Hybrid plant market bids.
 
-    Imbalance penalty avoidance
+Potential value:
 
-    On‑site generation integration
+- Reduce imbalance penalties.
+- Improve bid accuracy.
+- Optimize storage cycling.
+- Coordinate PPA and merchant revenue.
 
-6. Utility‑Scale Storage Operators
+Implementation needed:
 
-Built‑in: SOS2 degradation modeling, stochastic MPC, bid‑curve generation, market APIs, shadow‑price explainability.
+- Generation forecast adapter.
+- Plant availability model.
+- Market-specific bid formatting.
+- Compliance checks for the target ISO or PPA structure.
 
-What it unlocks:
+## 4. Microgrids and Campus Energy Systems
 
-    Energy arbitrage
+Target controllable assets:
 
-    Regulation services
+- Battery.
+- CHP or diesel generators.
+- Solar.
+- HVAC.
+- Thermal storage.
 
-    Spinning reserve
+Potential value:
 
-    Real‑time market participation
+- Islanding support.
+- Peak shaving.
+- Tariff arbitrage.
+- Resilience planning.
+- Carbon-aware dispatch.
 
-    Multi‑market stacking
+Implementation needed:
 
-A direct drop‑in for utility‑scale BESS operators.
-7. Commercial Buildings (Smart Buildings / BEMS)
+- Generator constraints.
+- Fuel cost model.
+- Critical load and islanding constraints.
+- Building automation interface.
+- Fail-closed safety logic for islanded operation.
 
-Controllable assets: HVAC, lighting, thermal storage, EV chargers, rooftop solar.
+## 5. Industrial Loads
 
-What it unlocks:
+Target controllable assets:
 
-    Demand charge reduction
+- Batch processes.
+- Refrigeration cycles.
+- Pumps and drives.
+- Compressed air.
+- On-site generation.
 
-    TOU optimization
+Potential value:
 
-    Comfort‑aware dispatch
+- Shift production to low-price hours.
+- Monetize flexibility.
+- Avoid imbalance penalties.
+- Reduce demand charges.
 
-    Carbon‑aware scheduling
+Implementation needed:
 
-    Building‑to‑grid participation
+- Process-specific constraints.
+- Product inventory or thermal inertia model.
+- Safety interlocks and override support.
+- Read-only replay against historical process data before any command path.
 
-8. AI Compute Clusters (GPU Farms)
+## 6. Utility-Scale Storage Operators
 
-Integrates with: Kubernetes, Slurm, Ray, GPU power capping, workload migration.
+This is closest to the current implementation.
 
-What it unlocks:
+Already relevant:
 
-    Training jobs shifted to low‑price intervals
+- Battery state tracking.
+- Degradation cost modeling.
+- Stochastic price scenarios.
+- Bid curve generation.
+- Safety-gated dispatch recommendations.
+- Audit logging and benchmark replay.
 
-    Non‑critical workload throttling
+Implementation needed:
 
-    Idle capacity monetized
+- Real market data adapter.
+- Real bid submission adapter.
+- Market-specific compliance checks.
+- More complete thermal and warranty constraints.
+- Operator-approved staged activation.
 
-    Battery‑coordinated compute
+## 7. Commercial Buildings
 
-    Cooling load reduction during peaks
+Target controllable assets:
 
-The AI‑native equivalent of Bitcoin mining integration.
-9. Hydrogen Electrolyzers & Power‑to‑X
+- HVAC.
+- Lighting.
+- Thermal storage.
+- EV chargers.
+- Rooftop solar.
 
-Controllable assets: electrolyzer power, hydrogen production rate, tank constraints, thermal limits.
+Potential value:
 
-What it unlocks:
+- Demand charge reduction.
+- TOU optimization.
+- Building-to-grid participation.
+- Comfort-aware dispatch.
 
-    Hydrogen production during low‑price windows
+Implementation needed:
 
-    Imbalance penalty avoidance
+- BACnet/Modbus/BMS adapter.
+- Comfort constraints.
+- Occupancy and weather forecasts.
+- Signed dry-run setpoint output before live BMS writes.
 
-    Renewable integration
+## 8. Hydrogen Electrolyzers and Power-to-X
 
-    Ancillary market participation
+Target controllable assets:
 
-Electrolyzers behave exactly like flexible loads — ApexBEMS excels here.
-10. Grid‑Edge Aggregators / VPP Operators
+- Electrolyzer power.
+- Hydrogen production rate.
+- Tank storage.
+- Thermal limits.
 
-Controllable assets: thousands of distributed devices, heterogeneous DERs, multi‑market bidding, telemetry aggregation.
+Potential value:
 
-What it unlocks:
+- Produce during low-price windows.
+- Avoid imbalance penalties.
+- Monetize flexibility.
+- Integrate renewables.
 
-    VPP construction from distributed resources
+Implementation needed:
 
-    Flexibility monetization at scale
+- Electrolyzer efficiency curve.
+- Tank and offtake constraints.
+- Product value model.
+- Equipment warranty and safety envelope checks.
 
-    Grid congestion reduction
+## 9. Grid-Edge Aggregators and VPP Operators
 
-    Balancing service provision
+Target controllable assets:
 
-    Multi‑ISO optimization
+- Heterogeneous DER fleets.
+- Batteries.
+- EV chargers.
+- Flexible loads.
+- On-site generation.
 
-11. Bitcoin Mining (Still One of the Strongest Use Cases)
+Potential value:
 
-Miners are:
+- Aggregate flexibility.
+- Reduce local congestion.
+- Submit multi-asset bids.
+- Provide balancing services.
 
-    fully controllable
+Implementation needed:
 
-    fast‑responding
+- Fleet telemetry ingestion.
+- Aggregation model.
+- Device-specific command adapters.
+- Market and settlement integration.
+- Per-device safety gateways and audit replay.
 
-    price‑sensitive
+## 10. Bitcoin Mining
 
-    interruptible
+Bitcoin mining remains one of the strongest fit cases because miners are:
 
-    geographically distributed
+- Highly controllable.
+- Fast responding.
+- Price sensitive.
+- Interruptible.
+- Often co-located with large electrical infrastructure.
 
-No other load class offers all five properties simultaneously.
+Current repository status:
 
-Mining + batteries + ApexBEMS = a high‑performance VPP with no compromises.
-Positioning — Choose Your One‑Liner
-General energy markets
+- Battery and market dispatch foundation exists.
+- Mining schemas exist.
+- Public Bitcoin network proxy benchmark exists.
+- Mining break-even unit tests exist.
+- Mining optimizer variable, read-only site telemetry adapter, signed dry-run command output, and live miner control adapter still need implementation.
 
-ApexBEMS turns any flexible load, generator, or battery into an autonomous, market‑participating asset.
-Data centers + AI
+## Practical Pilot Offer
 
-ApexBEMS transforms compute infrastructure into a price‑responsive energy asset — reducing cost while earning revenue.
-Bitcoin mining
+The easiest near-term pilot is a no-control shadow-mode replay:
 
-ApexBEMS converts mining farms into high‑performance virtual power plants with maximum arbitrage and grid‑service revenue.
+1. Ingest 30 days of site telemetry and price data.
+2. Replay ApexBEMS recommendations against actual site behavior.
+3. Report estimated value difference, SOC safety, curtailment opportunities, unsafe recommendation count, and audit trail completeness.
+4. Keep all command writes disabled.
+
+This creates measurable evidence before any production control path is considered.
+
+## Positioning
+
+Current implementation:
+
+> ApexBEMS is an open, tested, safety-gated shadow-mode foundation for market-aware battery dispatch and flexible-load integration.
+
+Near-term implementation target:
+
+> ApexBEMS turns storage and controllable loads into auditable, market-responsive site recommendations backed by replayable evidence.
+
+Validation boundary:
+
+Current evidence supports shadow-mode pilots and site-specific validation. It does not support direct autonomous production control until real site telemetry, signed dry-run commands, hardware-in-the-loop testing, and staged activation have been completed.
