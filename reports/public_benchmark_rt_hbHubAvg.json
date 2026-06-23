@@ -1,0 +1,763 @@
+{
+  "summary": {
+    "generated_at_utc": "2026-06-22T21:48:55.796626+00:00",
+    "source": "ERCOT dashboard RT SPP (https://www.ercot.com/api/1/services/read/dashboards/system-wide-prices.json)",
+    "price_node": "hbHubAvg",
+    "intervals": 66,
+    "price_min_usd_per_mwh": 19.67,
+    "price_mean_usd_per_mwh": 26.46621212121212,
+    "price_max_usd_per_mwh": 46.86,
+    "optimizer_success_rate": 1.0,
+    "soc_violations": 0,
+    "final_soc": 0.2821710513963799,
+    "total_storage_revenue_usd": 9.468506009005807,
+    "total_throughput_kwh": 1230.5193885017295,
+    "charge_intervals": 14,
+    "discharge_intervals": 19,
+    "idle_intervals": 33,
+    "health_fraction": 0.9999377183793533,
+    "btc_price_usd": 64176.125,
+    "fee_snapshot": {
+      "fastestFee": 1,
+      "halfHourFee": 1,
+      "hourFee": 1,
+      "economyFee": 1,
+      "minimumFee": 1
+    },
+    "network_hashrate_eh_s": 941.818410178474,
+    "avg_block_fees_btc": 0.014046723333333334,
+    "mining_proxy": {
+      "available": true,
+      "assumed_miner_power_kw": 1000.0,
+      "assumed_efficiency_j_per_th": 25.0,
+      "gross_revenue_usd_per_ph_day": 30.801125558524575,
+      "breakeven_usd_per_mwh": 51.33520926420763,
+      "always_on_energy_margin_usd": 410.33845285942584,
+      "curtailment_candidate_intervals": 0
+    },
+    "public_data_urls": {
+      "ercot_dashboard_prices": "https://www.ercot.com/api/1/services/read/dashboards/system-wide-prices.json",
+      "coinbase_btc_spot": "https://api.coinbase.com/v2/prices/BTC-USD/spot",
+      "mempool_recommended_fees": "https://mempool.space/api/v1/fees/recommended",
+      "mempool_hashrate": "https://mempool.space/api/v1/mining/hashrate/3d",
+      "mempool_recent_blocks": "https://mempool.space/api/v1/blocks"
+    },
+    "run_metadata": {
+      "command": "python.exe scripts\\run_public_benchmark.py --from-json reports\\public_benchmark_rt_hbHubAvg.json",
+      "git_commit": "e81034ab97bfb7bceeb92460289c079b17209c55",
+      "git_dirty": false,
+      "python_version": "3.12.13 (main, May 10 2026, 19:35:37) [MSC v.1944 64 bit (AMD64)]",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "package_versions": {
+        "numpy": "2.4.6",
+        "pandas": "3.0.3",
+        "PuLP": "3.3.2",
+        "scikit-learn": "1.9.0",
+        "scipy": "1.18.0",
+        "xgboost": "3.3.0",
+        "prophet": "1.3.0",
+        "tensorflow": "2.21.0",
+        "shap": "0.52.0",
+        "jsonschema": "4.26.0",
+        "pytest": "9.1.1"
+      },
+      "reproduction_command": "python.exe scripts\\run_public_benchmark.py --from-json reports\\public_benchmark_rt_hbHubAvg.json",
+      "live_command": "python.exe scripts\\run_public_benchmark.py --node hbHubAvg --market rt --horizon-steps 8 --miner-power-kw 1000.0 --miner-efficiency-j-per-th 25.0"
+    },
+    "horizon_steps": 8,
+    "scenario_count": 3,
+    "random_seed": 7,
+    "data_window_start": "2026-06-22T05:15:00+00:00",
+    "data_window_end": "2026-06-22T21:30:00+00:00",
+    "dispatch_interval_minutes": 15.0,
+    "config": {
+      "capacity_kwh": 1000.0,
+      "max_power_kw": 250.0,
+      "eff_ch": 0.95,
+      "eff_dis": 0.95,
+      "soc_min": 0.1,
+      "soc_max": 0.9,
+      "dt_hr": 0.25,
+      "solver": "CBC",
+      "time_limit_sec": 30,
+      "physical_dispatch_link": true,
+      "enforce_price_unit_check": true
+    },
+    "optimizer_failures": 0,
+    "safe_fallback_intervals": 0,
+    "soc_violations_before_clipping": 0,
+    "soc_clipping_events": 0,
+    "regenerated_from_json": true,
+    "source_json": "F:\\ApexBems-main(1)\\ApexBems-main\\reports\\public_benchmark_rt_hbHubAvg.json",
+    "dispatch_interval_minutes_inferred": true,
+    "generated_utc": "2026-06-22T21:48:55.796626+00:00",
+    "node": "hbHubAvg",
+    "price_unit_reported": "$/MWh",
+    "price_unit_optimizer": "$/kWh",
+    "ercot_mwh_to_kwh_conversion_applied": true,
+    "intervals_tested": 66,
+    "throughput_kwh": 1230.5193885017295
+  },
+  "dispatch": [
+    {
+      "timestamp": "2026-06-22T05:15:00+00:00",
+      "price_usd_per_mwh": 25.82,
+      "action_kw": 140.0,
+      "soc_before": 0.5,
+      "soc_after": 0.4631578947368421,
+      "solver_status": "Optimal",
+      "objective_usd": 2.077720593543536,
+      "interval_storage_revenue_usd": 0.9037
+    },
+    {
+      "timestamp": "2026-06-22T05:30:00+00:00",
+      "price_usd_per_mwh": 24.97,
+      "action_kw": 50.0,
+      "soc_before": 0.4631578947368421,
+      "soc_after": 0.45,
+      "solver_status": "Optimal",
+      "objective_usd": 1.9962764737185066,
+      "interval_storage_revenue_usd": 0.312125
+    },
+    {
+      "timestamp": "2026-06-22T05:45:00+00:00",
+      "price_usd_per_mwh": 24.82,
+      "action_kw": 140.0,
+      "soc_before": 0.45,
+      "soc_after": 0.4131578947368421,
+      "solver_status": "Optimal",
+      "objective_usd": 1.997766846339574,
+      "interval_storage_revenue_usd": 0.8687
+    },
+    {
+      "timestamp": "2026-06-22T06:00:00+00:00",
+      "price_usd_per_mwh": 24.27,
+      "action_kw": 0.0,
+      "soc_before": 0.4131578947368421,
+      "soc_after": 0.4131578947368421,
+      "solver_status": "Optimal",
+      "objective_usd": 2.0098486234656963,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T06:15:00+00:00",
+      "price_usd_per_mwh": 23.54,
+      "action_kw": 40.0,
+      "soc_before": 0.4131578947368421,
+      "soc_after": 0.40263157894736845,
+      "solver_status": "Optimal",
+      "objective_usd": 1.9566804870618477,
+      "interval_storage_revenue_usd": 0.2354
+    },
+    {
+      "timestamp": "2026-06-22T06:30:00+00:00",
+      "price_usd_per_mwh": 23.86,
+      "action_kw": 150.0,
+      "soc_before": 0.40263157894736845,
+      "soc_after": 0.3631578947368421,
+      "solver_status": "Optimal",
+      "objective_usd": 1.9517519075026977,
+      "interval_storage_revenue_usd": 0.8947499999999999
+    },
+    {
+      "timestamp": "2026-06-22T06:45:00+00:00",
+      "price_usd_per_mwh": 22.97,
+      "action_kw": 0.0,
+      "soc_before": 0.3631578947368421,
+      "soc_after": 0.3631578947368421,
+      "solver_status": "Optimal",
+      "objective_usd": 1.896017894649032,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T07:00:00+00:00",
+      "price_usd_per_mwh": 22.55,
+      "action_kw": 0.0,
+      "soc_before": 0.3631578947368421,
+      "soc_after": 0.3631578947368421,
+      "solver_status": "Optimal",
+      "objective_usd": 1.8752817822408931,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T07:15:00+00:00",
+      "price_usd_per_mwh": 22.43,
+      "action_kw": 0.0,
+      "soc_before": 0.3631578947368421,
+      "soc_after": 0.3631578947368421,
+      "solver_status": "Optimal",
+      "objective_usd": 1.9354309719728016,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T07:30:00+00:00",
+      "price_usd_per_mwh": 22.28,
+      "action_kw": 0.0,
+      "soc_before": 0.3631578947368421,
+      "soc_after": 0.3631578947368421,
+      "solver_status": "Optimal",
+      "objective_usd": 1.9812843640056448,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T07:45:00+00:00",
+      "price_usd_per_mwh": 22.27,
+      "action_kw": 0.0,
+      "soc_before": 0.3631578947368421,
+      "soc_after": 0.3631578947368421,
+      "solver_status": "Optimal",
+      "objective_usd": 2.0306123797374678,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T08:00:00+00:00",
+      "price_usd_per_mwh": 22.3,
+      "action_kw": 0.0,
+      "soc_before": 0.3631578947368421,
+      "soc_after": 0.3631578947368421,
+      "solver_status": "Optimal",
+      "objective_usd": 2.0610734471880443,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T08:15:00+00:00",
+      "price_usd_per_mwh": 21.52,
+      "action_kw": 0.0,
+      "soc_before": 0.3631578947368421,
+      "soc_after": 0.3631578947368421,
+      "solver_status": "Optimal",
+      "objective_usd": 2.126952776146503,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T08:30:00+00:00",
+      "price_usd_per_mwh": 22.2,
+      "action_kw": 0.0,
+      "soc_before": 0.3631578947368421,
+      "soc_after": 0.3631578947368421,
+      "solver_status": "Optimal",
+      "objective_usd": 2.048820897958036,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T08:45:00+00:00",
+      "price_usd_per_mwh": 22.54,
+      "action_kw": 0.0,
+      "soc_before": 0.3631578947368421,
+      "soc_after": 0.3631578947368421,
+      "solver_status": "Optimal",
+      "objective_usd": 2.080713963917865,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T09:00:00+00:00",
+      "price_usd_per_mwh": 23.77,
+      "action_kw": 0.0,
+      "soc_before": 0.3631578947368421,
+      "soc_after": 0.3631578947368421,
+      "solver_status": "Optimal",
+      "objective_usd": 2.066757304212723,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T09:15:00+00:00",
+      "price_usd_per_mwh": 25.08,
+      "action_kw": 0.0,
+      "soc_before": 0.3631578947368421,
+      "soc_after": 0.3631578947368421,
+      "solver_status": "Optimal",
+      "objective_usd": 2.142026546381523,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T09:30:00+00:00",
+      "price_usd_per_mwh": 25.94,
+      "action_kw": 150.0,
+      "soc_before": 0.3631578947368421,
+      "soc_after": 0.3236842105263158,
+      "solver_status": "Optimal",
+      "objective_usd": 2.156538699596869,
+      "interval_storage_revenue_usd": 0.97275
+    },
+    {
+      "timestamp": "2026-06-22T09:45:00+00:00",
+      "price_usd_per_mwh": 24.65,
+      "action_kw": 0.0,
+      "soc_before": 0.3236842105263158,
+      "soc_after": 0.3236842105263158,
+      "solver_status": "Optimal",
+      "objective_usd": 2.1743853648028546,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T10:00:00+00:00",
+      "price_usd_per_mwh": 23.45,
+      "action_kw": 0.0,
+      "soc_before": 0.3236842105263158,
+      "soc_after": 0.3236842105263158,
+      "solver_status": "Optimal",
+      "objective_usd": 2.2711035316559878,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T10:15:00+00:00",
+      "price_usd_per_mwh": 24.09,
+      "action_kw": -16.481994,
+      "soc_before": 0.3236842105263158,
+      "soc_after": 0.3275986841013158,
+      "solver_status": "Optimal",
+      "objective_usd": 2.5842639422782407,
+      "interval_storage_revenue_usd": -0.099262808865
+    },
+    {
+      "timestamp": "2026-06-22T10:30:00+00:00",
+      "price_usd_per_mwh": 24.79,
+      "action_kw": -50.0,
+      "soc_before": 0.3275986841013158,
+      "soc_after": 0.33947368410131584,
+      "solver_status": "Optimal",
+      "objective_usd": 2.7401071665546013,
+      "interval_storage_revenue_usd": -0.309875
+    },
+    {
+      "timestamp": "2026-06-22T10:45:00+00:00",
+      "price_usd_per_mwh": 25.85,
+      "action_kw": 0.0,
+      "soc_before": 0.33947368410131584,
+      "soc_after": 0.33947368410131584,
+      "solver_status": "Optimal",
+      "objective_usd": 2.7168414975716066,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T11:00:00+00:00",
+      "price_usd_per_mwh": 24.43,
+      "action_kw": -138.08864,
+      "soc_before": 0.33947368410131584,
+      "soc_after": 0.37226973610131586,
+      "solver_status": "Optimal",
+      "objective_usd": 2.722144384020244,
+      "interval_storage_revenue_usd": -0.8433763688
+    },
+    {
+      "timestamp": "2026-06-22T11:15:00+00:00",
+      "price_usd_per_mwh": 24.56,
+      "action_kw": -150.0,
+      "soc_before": 0.37226973610131586,
+      "soc_after": 0.4078947361013159,
+      "solver_status": "Optimal",
+      "objective_usd": 2.8885444553371045,
+      "interval_storage_revenue_usd": -0.9209999999999999
+    },
+    {
+      "timestamp": "2026-06-22T11:30:00+00:00",
+      "price_usd_per_mwh": 26.65,
+      "action_kw": 0.0,
+      "soc_before": 0.4078947361013159,
+      "soc_after": 0.4078947361013159,
+      "solver_status": "Optimal",
+      "objective_usd": 3.0724268755915065,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T11:45:00+00:00",
+      "price_usd_per_mwh": 28.42,
+      "action_kw": 36.375,
+      "soc_before": 0.4078947361013159,
+      "soc_after": 0.39832236768026325,
+      "solver_status": "Optimal",
+      "objective_usd": 3.0857636024110393,
+      "interval_storage_revenue_usd": 0.258444375
+    },
+    {
+      "timestamp": "2026-06-22T12:00:00+00:00",
+      "price_usd_per_mwh": 34.74,
+      "action_kw": 250.0,
+      "soc_before": 0.39832236768026325,
+      "soc_after": 0.3325328939960527,
+      "solver_status": "Optimal",
+      "objective_usd": 2.9001353957600013,
+      "interval_storage_revenue_usd": 2.17125
+    },
+    {
+      "timestamp": "2026-06-22T12:15:00+00:00",
+      "price_usd_per_mwh": 32.78,
+      "action_kw": 250.0,
+      "soc_before": 0.3325328939960527,
+      "soc_after": 0.26674342031184217,
+      "solver_status": "Optimal",
+      "objective_usd": 2.6922229900158134,
+      "interval_storage_revenue_usd": 2.04875
+    },
+    {
+      "timestamp": "2026-06-22T12:30:00+00:00",
+      "price_usd_per_mwh": 31.24,
+      "action_kw": 250.0,
+      "soc_before": 0.26674342031184217,
+      "soc_after": 0.20095394662763164,
+      "solver_status": "Optimal",
+      "objective_usd": 2.4130453321140215,
+      "interval_storage_revenue_usd": 1.9525
+    },
+    {
+      "timestamp": "2026-06-22T12:45:00+00:00",
+      "price_usd_per_mwh": 26.95,
+      "action_kw": 250.0,
+      "soc_before": 0.20095394662763164,
+      "soc_after": 0.1351644729434211,
+      "solver_status": "Optimal",
+      "objective_usd": 2.0474533272559645,
+      "interval_storage_revenue_usd": 1.684375
+    },
+    {
+      "timestamp": "2026-06-22T13:00:00+00:00",
+      "price_usd_per_mwh": 22.89,
+      "action_kw": 133.625,
+      "soc_before": 0.1351644729434211,
+      "soc_after": 0.1,
+      "solver_status": "Optimal",
+      "objective_usd": 1.6000423471269638,
+      "interval_storage_revenue_usd": 0.7646690625
+    },
+    {
+      "timestamp": "2026-06-22T13:15:00+00:00",
+      "price_usd_per_mwh": 22.61,
+      "action_kw": 0.0,
+      "soc_before": 0.1,
+      "soc_after": 0.1,
+      "solver_status": "Optimal",
+      "objective_usd": 0.8668034311912506,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T13:30:00+00:00",
+      "price_usd_per_mwh": 22.29,
+      "action_kw": 0.0,
+      "soc_before": 0.1,
+      "soc_after": 0.1,
+      "solver_status": "Optimal",
+      "objective_usd": 0.8277225344334599,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T13:45:00+00:00",
+      "price_usd_per_mwh": 22.87,
+      "action_kw": 0.0,
+      "soc_before": 0.1,
+      "soc_after": 0.1,
+      "solver_status": "Optimal",
+      "objective_usd": 0.8372402892188464,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T14:00:00+00:00",
+      "price_usd_per_mwh": 22.45,
+      "action_kw": 0.0,
+      "soc_before": 0.1,
+      "soc_after": 0.1,
+      "solver_status": "Optimal",
+      "objective_usd": 0.8357031173851928,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T14:15:00+00:00",
+      "price_usd_per_mwh": 22.05,
+      "action_kw": 0.0,
+      "soc_before": 0.1,
+      "soc_after": 0.1,
+      "solver_status": "Optimal",
+      "objective_usd": 0.8445150631579358,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T14:30:00+00:00",
+      "price_usd_per_mwh": 21.71,
+      "action_kw": 0.0,
+      "soc_before": 0.1,
+      "soc_after": 0.1,
+      "solver_status": "Optimal",
+      "objective_usd": 0.8409755498252939,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T14:45:00+00:00",
+      "price_usd_per_mwh": 20.34,
+      "action_kw": -150.0,
+      "soc_before": 0.1,
+      "soc_after": 0.135625,
+      "solver_status": "Optimal",
+      "objective_usd": 0.8844228666138525,
+      "interval_storage_revenue_usd": -0.76275
+    },
+    {
+      "timestamp": "2026-06-22T15:00:00+00:00",
+      "price_usd_per_mwh": 19.67,
+      "action_kw": -16.204986,
+      "soc_before": 0.135625,
+      "soc_after": 0.139473684175,
+      "solver_status": "Optimal",
+      "objective_usd": 1.6344568994979318,
+      "interval_storage_revenue_usd": -0.07968801865500001
+    },
+    {
+      "timestamp": "2026-06-22T15:15:00+00:00",
+      "price_usd_per_mwh": 19.77,
+      "action_kw": -6.9178664e-09,
+      "soc_before": 0.139473684175,
+      "soc_after": 0.139473684176643,
+      "solver_status": "Optimal",
+      "objective_usd": 1.6993122608839006,
+      "interval_storage_revenue_usd": -3.4191554682e-11
+    },
+    {
+      "timestamp": "2026-06-22T15:30:00+00:00",
+      "price_usd_per_mwh": 20.8,
+      "action_kw": 0.0,
+      "soc_before": 0.139473684176643,
+      "soc_after": 0.139473684176643,
+      "solver_status": "Optimal",
+      "objective_usd": 1.746443317247585,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T15:45:00+00:00",
+      "price_usd_per_mwh": 20.92,
+      "action_kw": 0.0,
+      "soc_before": 0.139473684176643,
+      "soc_after": 0.139473684176643,
+      "solver_status": "Optimal",
+      "objective_usd": 1.707589398958203,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T16:00:00+00:00",
+      "price_usd_per_mwh": 22.66,
+      "action_kw": 0.0,
+      "soc_before": 0.139473684176643,
+      "soc_after": 0.139473684176643,
+      "solver_status": "Optimal",
+      "objective_usd": 1.8445127421932812,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T16:15:00+00:00",
+      "price_usd_per_mwh": 24.07,
+      "action_kw": 0.0,
+      "soc_before": 0.139473684176643,
+      "soc_after": 0.139473684176643,
+      "solver_status": "Optimal",
+      "objective_usd": 1.8149498422738546,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T16:30:00+00:00",
+      "price_usd_per_mwh": 21.99,
+      "action_kw": -10.803324,
+      "soc_before": 0.139473684176643,
+      "soc_after": 0.142039473626643,
+      "solver_status": "Optimal",
+      "objective_usd": 1.8507391336106203,
+      "interval_storage_revenue_usd": -0.059391273689999996
+    },
+    {
+      "timestamp": "2026-06-22T16:45:00+00:00",
+      "price_usd_per_mwh": 21.16,
+      "action_kw": 0.0,
+      "soc_before": 0.142039473626643,
+      "soc_after": 0.142039473626643,
+      "solver_status": "Optimal",
+      "objective_usd": 1.9568934354357264,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T17:00:00+00:00",
+      "price_usd_per_mwh": 22.53,
+      "action_kw": -150.0,
+      "soc_before": 0.142039473626643,
+      "soc_after": 0.17766447362664298,
+      "solver_status": "Optimal",
+      "objective_usd": 2.153550713375894,
+      "interval_storage_revenue_usd": -0.844875
+    },
+    {
+      "timestamp": "2026-06-22T17:15:00+00:00",
+      "price_usd_per_mwh": 23.33,
+      "action_kw": 0.0,
+      "soc_before": 0.17766447362664298,
+      "soc_after": 0.17766447362664298,
+      "solver_status": "Optimal",
+      "objective_usd": 2.7750139148921824,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T17:30:00+00:00",
+      "price_usd_per_mwh": 22.21,
+      "action_kw": -250.0,
+      "soc_before": 0.17766447362664298,
+      "soc_after": 0.23703947362664296,
+      "solver_status": "Optimal",
+      "objective_usd": 3.9773696820642472,
+      "interval_storage_revenue_usd": -1.388125
+    },
+    {
+      "timestamp": "2026-06-22T17:45:00+00:00",
+      "price_usd_per_mwh": 24.58,
+      "action_kw": -220.49861,
+      "soc_before": 0.23703947362664296,
+      "soc_after": 0.289407893501643,
+      "solver_status": "Optimal",
+      "objective_usd": 4.3433163373972485,
+      "interval_storage_revenue_usd": -1.35496395845
+    },
+    {
+      "timestamp": "2026-06-22T18:00:00+00:00",
+      "price_usd_per_mwh": 25.38,
+      "action_kw": -250.0,
+      "soc_before": 0.289407893501643,
+      "soc_after": 0.348782893501643,
+      "solver_status": "Optimal",
+      "objective_usd": 4.808695087731371,
+      "interval_storage_revenue_usd": -1.58625
+    },
+    {
+      "timestamp": "2026-06-22T18:15:00+00:00",
+      "price_usd_per_mwh": 24.48,
+      "action_kw": -250.0,
+      "soc_before": 0.348782893501643,
+      "soc_after": 0.408157893501643,
+      "solver_status": "Optimal",
+      "objective_usd": 4.566655361168975,
+      "interval_storage_revenue_usd": -1.53
+    },
+    {
+      "timestamp": "2026-06-22T18:30:00+00:00",
+      "price_usd_per_mwh": 27.06,
+      "action_kw": -250.0,
+      "soc_before": 0.408157893501643,
+      "soc_after": 0.467532893501643,
+      "solver_status": "Optimal",
+      "objective_usd": 4.313027398283232,
+      "interval_storage_revenue_usd": -1.69125
+    },
+    {
+      "timestamp": "2026-06-22T18:45:00+00:00",
+      "price_usd_per_mwh": 30.19,
+      "action_kw": -250.0,
+      "soc_before": 0.467532893501643,
+      "soc_after": 0.526907893501643,
+      "solver_status": "Optimal",
+      "objective_usd": 3.973149534970479,
+      "interval_storage_revenue_usd": -1.886875
+    },
+    {
+      "timestamp": "2026-06-22T19:00:00+00:00",
+      "price_usd_per_mwh": 36.26,
+      "action_kw": 0.0,
+      "soc_before": 0.526907893501643,
+      "soc_after": 0.526907893501643,
+      "solver_status": "Optimal",
+      "objective_usd": 3.7680994267923777,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T19:15:00+00:00",
+      "price_usd_per_mwh": 46.86,
+      "action_kw": 250.0,
+      "soc_before": 0.526907893501643,
+      "soc_after": 0.4611184198174325,
+      "solver_status": "Optimal",
+      "objective_usd": 3.819561057269873,
+      "interval_storage_revenue_usd": 2.92875
+    },
+    {
+      "timestamp": "2026-06-22T19:30:00+00:00",
+      "price_usd_per_mwh": 40.04,
+      "action_kw": 50.0,
+      "soc_before": 0.4611184198174325,
+      "soc_after": 0.4479605250805904,
+      "solver_status": "Optimal",
+      "objective_usd": 3.5509240408457585,
+      "interval_storage_revenue_usd": 0.5005
+    },
+    {
+      "timestamp": "2026-06-22T19:45:00+00:00",
+      "price_usd_per_mwh": 44.98,
+      "action_kw": 250.0,
+      "soc_before": 0.4479605250805904,
+      "soc_after": 0.38217105139637986,
+      "solver_status": "Optimal",
+      "objective_usd": 3.5526100459806993,
+      "interval_storage_revenue_usd": 2.81125
+    },
+    {
+      "timestamp": "2026-06-22T20:00:00+00:00",
+      "price_usd_per_mwh": 38.75,
+      "action_kw": 140.0,
+      "soc_before": 0.38217105139637986,
+      "soc_after": 0.34532894613322196,
+      "solver_status": "Optimal",
+      "objective_usd": 3.197855030717557,
+      "interval_storage_revenue_usd": 1.35625
+    },
+    {
+      "timestamp": "2026-06-22T20:15:00+00:00",
+      "price_usd_per_mwh": 35.54,
+      "action_kw": 140.0,
+      "soc_before": 0.34532894613322196,
+      "soc_after": 0.30848684087006406,
+      "solver_status": "Optimal",
+      "objective_usd": 3.1499296550663387,
+      "interval_storage_revenue_usd": 1.2439
+    },
+    {
+      "timestamp": "2026-06-22T20:30:00+00:00",
+      "price_usd_per_mwh": 35.47,
+      "action_kw": 50.0,
+      "soc_before": 0.30848684087006406,
+      "soc_after": 0.29532894613322197,
+      "solver_status": "Optimal",
+      "objective_usd": 3.072433032784406,
+      "interval_storage_revenue_usd": 0.443375
+    },
+    {
+      "timestamp": "2026-06-22T20:45:00+00:00",
+      "price_usd_per_mwh": 37.98,
+      "action_kw": 50.0,
+      "soc_before": 0.29532894613322197,
+      "soc_after": 0.2821710513963799,
+      "solver_status": "Optimal",
+      "objective_usd": 3.1426447164738613,
+      "interval_storage_revenue_usd": 0.47475
+    },
+    {
+      "timestamp": "2026-06-22T21:00:00+00:00",
+      "price_usd_per_mwh": 33.94,
+      "action_kw": 0.0,
+      "soc_before": 0.2821710513963799,
+      "soc_after": 0.2821710513963799,
+      "solver_status": "Optimal",
+      "objective_usd": 2.9968731544009524,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T21:15:00+00:00",
+      "price_usd_per_mwh": 37.44,
+      "action_kw": 0.0,
+      "soc_before": 0.2821710513963799,
+      "soc_after": 0.2821710513963799,
+      "solver_status": "Optimal",
+      "objective_usd": 3.1790702517251335,
+      "interval_storage_revenue_usd": 0.0
+    },
+    {
+      "timestamp": "2026-06-22T21:30:00+00:00",
+      "price_usd_per_mwh": 35.77,
+      "action_kw": 0.0,
+      "soc_before": 0.2821710513963799,
+      "soc_after": 0.2821710513963799,
+      "solver_status": "Optimal",
+      "objective_usd": 3.09993220645375,
+      "interval_storage_revenue_usd": 0.0
+    }
+  ]
+}
