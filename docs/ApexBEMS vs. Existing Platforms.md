@@ -1,12 +1,12 @@
 # ApexBEMS vs. Existing Platforms
 
-ApexBEMS is best understood as an open, auditable, safety-gated shadow-mode optimization engine for storage and flexible energy assets. The current repository includes a preserved Python monolith, a modular `apex_bems` package, schema contracts, replayable public-data benchmarks, and a 79-test safety/parity suite; it is not yet a complete commercial SCADA/ISO integration product or live-control deployment package.
+ApexBEMS is best understood as an open, auditable, safety-gated shadow-mode optimization engine for storage and flexible energy assets. The current repository includes a preserved Python monolith, a modular `apex_bems` package, schema contracts, read-only telemetry normalization, replayable public-data benchmarks, a read-only shadow-site runner, and an 87-test safety/parity suite; it is not yet a complete commercial SCADA/ISO integration product or live-control deployment package.
 
 This comparison is not claiming that ApexBEMS currently replaces mature commercial EMS, SCADA, or VPP products. Many commercial systems already include field-tested integrations, market interfaces, support teams, and operational certifications. ApexBEMS differentiates on openness, auditability, reproducibility, safety-gated shadow mode, and inspectable optimization logic.
 
 Current verified claim:
 
-> ApexBEMS is a test-covered, public-data benchmarked, shadow-mode energy optimization engine with safety-gated dispatch recommendations and replayable audit logs.
+> ApexBEMS includes a virtual-site HIL simulator that proves command contracts, safety gating, adapter acknowledgements, telemetry feedback, and audit persistence using real benchmark-seeded conditions before live hardware integration.
 
 ## Capability Matrix
 
@@ -17,13 +17,13 @@ Current verified claim:
 | Forecasting | LSTM, Prophet, XGBoost wrappers plus fallbacks | Proprietary or external |
 | Explainability | Shadow prices and optional SHAP feature importance | Often limited |
 | Audit trail | SQLite dispatch log with replayable decision context | Platform-specific |
-| Safety controls | `SafetyGateway`, `PolicyValidator`, shadow-mode defaults, blocked market submission | Vendor-specific or hidden |
+| Safety controls | `SafetyGateway`, `PolicyValidator`, read-only telemetry adapters, shadow-mode defaults, blocked market submission | Vendor-specific or hidden |
 | Metrics | Optimizer success/failure, safe fallback, SOC clipping, SOC violation counters | Often proprietary or vendor-specific |
 | Schema contracts | JSON Schema documents plus validation helpers | Vendor-specific APIs |
 | Public benchmark | ERCOT `$/MWh` to optimizer `$/kWh` replay with Bitcoin mining proxy | Usually internal or unavailable |
 | Source access | Preserved monolith plus modular package | Closed |
 | Testability | Pytest suite with production-hardening, benchmark, real-world, and parity coverage | Usually not externally inspectable |
-| Miner/PCS connectors | Contract target only | Vendor-dependent |
+| Miner/PCS connectors | Read-only mapping/replay telemetry adapter plus contracts; no live vendor driver | Vendor-dependent |
 | ISO integrations | Simulated client only, market submission blocked by default | Usually available in commercial platforms |
 
 ## Current Strengths
@@ -42,15 +42,27 @@ The test suite covers core behavior, production-hardening checks, public benchma
 
 ### Safety-Gated Shadow Mode
 
-The modular controller defaults to recommendation-only behavior. Dispatch is checked by `SafetyGateway` before state update or submission, and market submission is blocked unless explicitly enabled.
+The modular controller defaults to recommendation-only behavior. Dispatch is checked by `SafetyGateway` before state update or submission, telemetry is normalized through a read-only adapter layer, and market submission is blocked unless explicitly enabled.
 
 ### Public Benchmark Evidence
 
 The benchmark replays public ERCOT real-time prices through the optimizer, converts market prices from `$/MWh` to `$/kWh`, and reports machine-readable JSON, Markdown, and CSV artifacts. The refreshed `hbHubAvg` benchmark covers 66 intervals with 100% optimizer success, zero optimizer failures, zero safe fallback intervals, and zero raw SOC violations before clipping.
 
+## Virtual-Site HIL Proof
+
+The repository now includes a virtual-site HIL simulator and proof artifact.
+
+- HIL status: PASS
+- PCS command: accepted
+- Miner command: accepted
+- Safety gate: passed
+- Telemetry feedback: updated
+- Audit persistence: confirmed
+- Artifact: `reports/virtual_site_hil_latest.json`
+
 ### Schema-First Direction
 
-The repository already contains explicit contract documents for telemetry and command payloads. These contracts now have tests that validate representative examples.
+The repository contains explicit contract documents for telemetry and command payloads. These contracts now have tests that validate representative examples, including PCS ramp/mode fields, breaker state, transformer state, feeder constraints, and site telemetry envelope references.
 
 ## Where ApexBEMS Is Strongest Today
 
@@ -127,10 +139,10 @@ These are implementation gaps, not positioning details:
 - No live ISO market connector.
 - No live PCS driver or SCADA control path.
 - No live miner manager connector.
-- No shadow-mode telemetry adapter for private site meter, PCS, breaker, tariff, alarm, and miner streams.
-- No signed dry-run command output yet.
+- No live vendor telemetry drivers for private site meter, PCS, breaker, transformer, feeder, tariff, alarm, and miner streams. Read-only mapping/replay normalization is implemented.
+- No cryptographic signatures on dry-run command artifacts yet.
 - Mining load is not yet part of the optimizer decision variables.
-- Thermal derating is not implemented, despite temperature being tracked for degradation.
+- Battery thermal derating is not implemented, despite temperature being tracked for degradation. Transformer thermal limit blocking is implemented when telemetry is provided.
 - The schema files should eventually be renamed from `.py` to `.schema.json`.
 
 ## Where Commercial Platforms Still Lead
@@ -163,11 +175,11 @@ The most realistic pilot path is:
 3. Compare actual site behavior against ApexBEMS recommendations.
 4. Report estimated value difference, SOC safety, unsafe recommendation count, fallback count, and audit completeness.
 5. Only after successful replay, move to signed dry-run commands.
-6. Only after dry-run validation and operator approval, consider staged hardware-in-the-loop testing.
+6. Only after dry-run validation and operator approval, consider staged live hardware activation.
 
 This keeps adoption low-risk because ApexBEMS can prove value before any live control path is enabled.
 
-After read-only site telemetry adapters, 30-day replay benchmarks, signed dry-run command output, and staged hardware-in-the-loop validation are implemented, the stronger claim becomes:
+After live-read vendor telemetry drivers, 30-day private-site replay benchmarks, cryptographically signed dry-run command output, and staged live hardware activation are implemented, the stronger claim becomes:
 
 > ApexBEMS is a pilot-ready operator decision engine for storage, compute load, and market participation.
 

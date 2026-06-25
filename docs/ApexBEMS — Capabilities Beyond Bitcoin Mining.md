@@ -6,7 +6,17 @@ This document describes target applications. Some require adapters, signed dry-r
 
 Current verified claim:
 
-> ApexBEMS is a test-covered, public-data benchmarked, shadow-mode energy optimization engine with safety-gated dispatch recommendations and replayable audit logs.
+> ApexBEMS includes a virtual-site HIL simulator that proves command contracts, safety gating, adapter acknowledgements, telemetry feedback, and audit persistence using real benchmark-seeded conditions before live hardware integration.
+
+## Virtual-Site HIL Proof
+
+- HIL status: PASS
+- PCS command: accepted
+- Miner command: accepted
+- Safety gate: passed
+- Telemetry feedback: updated
+- Audit persistence: confirmed
+- Artifact: `reports/virtual_site_hil_latest.json`
 
 ## Best Current Fit
 
@@ -56,7 +66,7 @@ Implemented in the repository today:
 
 Current validation snapshot:
 
-- Pytest: `79 passed`.
+- Pytest: `87 passed`.
 - Public benchmark: `66` ERCOT `hbHubAvg` real-time intervals.
 - Optimizer success rate: `100.00%`.
 - Optimizer failures: `0`.
@@ -317,7 +327,7 @@ Current repository status:
 - Mining schemas exist.
 - Public Bitcoin network proxy benchmark exists.
 - Mining break-even unit tests exist.
-- Mining optimizer variable, read-only site telemetry adapter, signed dry-run command output, and live miner control adapter still need implementation.
+- Mining optimizer variable, signed dry-run command output, live vendor telemetry drivers, and live miner control adapter still need implementation. Read-only mapping/replay telemetry normalization is implemented for site safety context.
 
 ## Practical Pilot Offer
 
@@ -342,4 +352,4 @@ Near-term implementation target:
 
 Validation boundary:
 
-Current evidence supports shadow-mode pilots and site-specific validation. It does not support direct autonomous production control until real site telemetry, signed dry-run commands, hardware-in-the-loop testing, and staged activation have been completed.
+Current evidence supports shadow-mode pilots and site-specific validation, including virtual-site HIL proof. It does not support direct autonomous production control until real site telemetry integration, cryptographic command signing, and staged live activation have been completed.

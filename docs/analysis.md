@@ -19,11 +19,21 @@ The monolith remains functional and tested. New development should target the mo
 
 The current repository is best described as:
 
-> ApexBEMS is a test-covered, public-data benchmarked, shadow-mode energy optimization engine with safety-gated dispatch recommendations and replayable audit logs.
+> ApexBEMS includes a virtual-site HIL simulator that proves command contracts, safety gating, adapter acknowledgements, telemetry feedback, and audit persistence using real benchmark-seeded conditions before live hardware integration.
+
+## Virtual-Site HIL Proof
+
+- HIL status: PASS
+- PCS command: accepted
+- Miner command: accepted
+- Safety gate: passed
+- Telemetry feedback: updated
+- Audit persistence: confirmed
+- Artifact: `reports/virtual_site_hil_latest.json`
 
 Verified local test status:
 
-- Pytest: `79 passed`.
+- Pytest: `87 passed`.
 - Public benchmark: `66` ERCOT `hbHubAvg` real-time intervals replayed.
 - Optimizer success rate: `100.00%`.
 - Optimizer failures: `0`.
@@ -60,6 +70,8 @@ The current implementation has automated coverage for:
 - Replayable audit context and deterministic JSON hashing for benchmark and decision evidence.
 - Negative ERCOT prices and price spikes in parser and benchmark tests.
 - Mining break-even unit correctness.
+- Read-only telemetry adapter normalization for PCS, miner, meter, breaker, transformer, feeder, site-limit, and SCADA alarm streams.
+- Safety gating for breaker limits/interlocks, transformer thermal limits, feeder constraints, site import/export caps, PCS ramp rates, PCS charge/discharge modes, and controller telemetry propagation.
 
 Run:
 
@@ -70,7 +82,7 @@ Run:
 Expected result:
 
 ```text
-79 passed
+87 passed
 ```
 
 Run the live public benchmark:
@@ -81,15 +93,26 @@ Run the live public benchmark:
 
 The benchmark writes Markdown, JSON, and CSV artifacts under `reports/`. It validates behavior on real public prices and Bitcoin network signals, but it does not replace read-only shadow mode against private site telemetry.
 
+Run one read-only private-site telemetry shadow step from a unified envelope:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\run_shadow_site.py --telemetry-json path\to\site-envelope.json --out reports\shadow_site_latest.json
+```
+
+The runner reads JSON from a file, latest file in a directory, or a read-only HTTP endpoint, validates the envelope, normalizes site telemetry into `SiteTelemetrySnapshot`, feeds `MPController.step()`, and writes a machine-readable shadow decision artifact without sending control or market commands.
+
 ## Implemented Architecture
 
 The current internal flow is:
 
 ```text
-Market/BTC/Telemetry inputs
+Market/BTC/Read-only telemetry inputs
         |
         v
 SchemaValidation + Price Unit Checks
+        |
+        v
+TelemetryAdapter / SiteTelemetrySnapshot
         |
         v
 MPController.step()
@@ -98,7 +121,7 @@ MPController.step()
         +--> OptimizationService.generate_bid_curve()
         +--> PolicyValidator.validate_bid()
         +--> OptimizationService.optimize()
-        +--> SafetyGateway.validate_dispatch()
+        +--> SafetyGateway.validate_dispatch(telemetry=...)
         +--> BatteryStateService.update_state()
         +--> AuditLogger.log_plan()
         +--> MetricsRegistry.snapshot()
@@ -106,13 +129,13 @@ MPController.step()
              only when shadow_mode=False and allow_market_submission=True
 ```
 
-The runtime input accepted by `MPController.step()` is currently a Pandas DataFrame with a `price` column. Public benchmark and schema tests validate external payload shapes, but a full live site telemetry adapter is still a future phase.
+The runtime input accepted by `MPController.step()` is a Pandas DataFrame with a `price` column plus optional read-only telemetry mappings for PCS, miner, BTC feed, meter, alarm/breaker state, transformer telemetry, feeder constraints, and site limits. The implemented adapter normalizes those inputs into a deterministic `SiteTelemetrySnapshot`, carries miner load context, and passes the resulting safety payload into `SafetyGateway`. Live vendor drivers are still a future phase.
 
 ## Safety, Auditability, and Shadow Mode
 
 The current modular implementation includes production-hardening primitives intended to make recommendations auditable before any real control integration:
 
-- `SafetyGateway` validates finite dispatch, configured power limits, raw SOC movement before clipping, clipped SOC, and violation metadata.
+- `SafetyGateway` validates finite dispatch, configured power limits, raw SOC movement before clipping, clipped SOC, PCS limits/modes/ramp rates, breaker interlocks/limits, transformer thermal limits, feeder constraints, site import/export caps, and violation metadata.
 - `PolicyValidator` rejects unsafe or over-committed bid decisions.
 - `BEMSConfig` defaults to shadow mode and blocks market submission by default.
 - `AuditLogger` records dispatch plans, safety fields, decision context, stable hashes, and replayable records.
@@ -122,10 +145,11 @@ The current modular implementation includes production-hardening primitives inte
 
 ## Contract-Only Surfaces
 
-The schema folder defines external contracts that are not fully wired into the monolith yet:
+The schema folder defines external contracts for telemetry and command artifacts:
 
 - Miner telemetry.
-- PCS/battery telemetry.
+- PCS/battery telemetry, including ramp and charge/discharge mode fields.
+- Meter, breaker, transformer, feeder, curtailment, alarm, and operator override telemetry.
 - Market price and forecast feeds.
 - BTC and fee market feed.
 - Unified site telemetry envelope.
@@ -134,18 +158,18 @@ The schema folder defines external contracts that are not fully wired into the m
 - Internal dispatch decision payload.
 - ISO bid payload.
 
-The current code emits internal objects such as `DispatchPlan` and `List[Tuple[price, quantity_kw]]`. Schema validation exists, but full live adapters for site telemetry, signed dry-run command payloads, PCS command output, miner control output, and ISO bid submission remain future implementation work.
+The current code emits internal objects such as `DispatchPlan` and `List[Tuple[price, quantity_kw]]`. Schema validation and read-only telemetry normalization exist, but live vendor drivers, signed dry-run command payloads, PCS command output, miner control output, and ISO bid submission remain future implementation work.
 
 ## Important Implementation Gaps
 
 These should be addressed before calling the system production-ready:
 
-- Live site telemetry adapters are missing. Add read-only adapters for PCS, meter, miner, breaker, tariff, and SCADA/event streams.
-- Signed dry-run command output is missing. Add command signing and replayable dry-run artifacts before any real control path.
+- Live vendor telemetry drivers are missing. The implemented read-only mapping/replay adapter covers PCS, miner, meter, breaker, transformer, feeder, site-limit, and SCADA/event streams, but it does not poll real devices or authenticate to vendor APIs.
+- Cryptographic signing of dry-run command artifacts is still missing. Replayable dry-run command artifacts are implemented in the virtual-site HIL path.
 - Miner load is not yet an optimizer decision variable. Current optimization controls battery/market commitments, not `P_MINE[t]`.
 - PCS and miner control integrations are not implemented. Current market API remains simulated and blocked by default in shadow mode.
-- Public benchmark data is not private site telemetry. It cannot prove behavior against a specific mining facility's PCS alarms, miner uptime, breaker limits, tariff details, or SCADA control path.
-- README and older strategy docs previously referenced thermal derating. Current code tracks temperature for degradation cost but does not implement hard thermal cutoffs or derating constraints.
+- Public benchmark data is not private site telemetry. It cannot prove behavior against a specific mining facility's PCS alarms, miner uptime, breaker limits, transformer thermal state, feeder constraints, tariff details, or SCADA control path.
+- Battery thermal derating remains future work. Transformer thermal limit blocking is implemented when transformer telemetry is provided.
 - The schema files use `.py` extensions. They parse as JSON and Python literals, but should eventually be renamed to `.schema.json` or moved behind a schema loader.
 
 ## Refactor Status and Priorities
@@ -164,8 +188,9 @@ The first split-only refactor introduced the following modular structure:
 10. `metrics.py`: in-memory metrics counters and snapshots.
 11. `schema_validation.py`: JSON Schema loading and validation helpers.
 12. `benchmark.py`: public-data benchmark execution and replay support.
+13. `telemetry.py`: read-only mapping/replay telemetry adapters and normalized site safety snapshots.
 
-Full live adapter modules remain a future phase.
+Full live vendor adapter modules remain a future phase.
 
 Refactor rule: keep `ApexBEMS.py` as the legacy baseline and add behavior changes only after both legacy and modular tests remain green.
 
@@ -182,4 +207,4 @@ Every new integration should add tests in the same style:
 
 Current evidence supports a shadow-mode pilot claim. It does not support calling ApexBEMS a production autonomous controller.
 
-The next milestone should be a 30-day replay benchmark using fixture data, a read-only shadow-mode telemetry adapter for PCS, meter, and miner streams, and signed dry-run command output. That is the difference between a strong public repository and a pilot-ready deployment package for an operator.
+The next milestone should be a 30-day replay benchmark using private fixture data, live-read vendor telemetry drivers feeding the read-only adapter layer, and cryptographically signed dry-run command output. That is the difference between a strong public repository and a pilot-ready deployment package for an operator.

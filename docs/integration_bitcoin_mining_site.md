@@ -4,7 +4,7 @@ This document describes the target integration architecture for a Bitcoin mining
 
 Current verified claim:
 
-> ApexBEMS is a test-covered, public-data benchmarked, shadow-mode energy optimization engine with safety-gated dispatch recommendations and replayable audit logs.
+> ApexBEMS includes a virtual-site HIL simulator that proves command contracts, safety gating, adapter acknowledgements, telemetry feedback, and audit persistence using real benchmark-seeded conditions before live hardware integration.
 
 ## Current Status
 
@@ -29,7 +29,7 @@ Implemented today:
 
 Verified local snapshot:
 
-- Pytest: `79 passed`.
+- Pytest: `87 passed`.
 - Public benchmark: `66` ERCOT `hbHubAvg` real-time intervals.
 - Optimizer success rate: `100.00%`.
 - Optimizer failures: `0`.
@@ -45,7 +45,17 @@ Not implemented yet:
 - Mining load as an optimization decision variable.
 - Read-only shadow-mode connector for actual site telemetry.
 - Signed dry-run PCS/miner command output.
-- Hardware-in-the-loop validation.
+- Live hardware-in-the-loop validation against real site equipment.
+
+## Virtual-Site HIL Proof
+
+- HIL status: PASS
+- PCS command: accepted
+- Miner command: accepted
+- Safety gate: passed
+- Telemetry feedback: updated
+- Audit persistence: confirmed
+- Artifact: `reports/virtual_site_hil_latest.json`
 
 ## Site Layers
 
@@ -313,10 +323,11 @@ Before any staged activation, run a site-specific shadow-mode campaign:
 - [ ] Add `dispatch_id` and `command_id` generation.
 - [ ] Add `P_MINE[t]` to the optimizer.
 - [ ] Add mining economics to the objective.
-- [ ] Add signed miner manager dry-run adapter.
-- [ ] Add signed PCS dry-run adapter.
+- [x] Add virtual-site dry-run miner/PCS adapters with command+ack audit persistence.
+- [ ] Add cryptographic signing for miner manager dry-run artifacts.
+- [ ] Add cryptographic signing for PCS dry-run artifacts.
 - [ ] Add market dry-run adapter for ISO bid payloads.
 - [ ] Add per-asset safety gateways for miner, PCS, site interconnection, and market command outputs.
 - [ ] Add tests for all adapters.
 - [ ] Run live integrations only behind explicit configuration flags.
-- [ ] Run 30-day site telemetry replay before staged activation.
+- [ ] Run 30-day site telemetry replay before staged live activation.

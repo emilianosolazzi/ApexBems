@@ -6,17 +6,27 @@ This document explains the system in operator terms while staying aligned with t
 
 Current verified claim:
 
-> ApexBEMS is a test-covered, public-data benchmarked, shadow-mode energy optimization engine with safety-gated dispatch recommendations and replayable audit logs.
+> ApexBEMS includes a virtual-site HIL simulator that proves command contracts, safety gating, adapter acknowledgements, telemetry feedback, and audit persistence using real benchmark-seeded conditions before live hardware integration.
 
 Current validation snapshot:
 
-- Pytest: `79 passed`.
+- Pytest: `87 passed`.
 - Public benchmark: `66` ERCOT `hbHubAvg` real-time intervals.
 - Optimizer success rate: `100.00%`.
 - Optimizer failures: `0`.
 - Safe fallback intervals: `0`.
 - SOC violations before clipping: `0`.
 - Market submission: blocked by default.
+
+## Virtual-Site HIL Proof
+
+- HIL status: PASS
+- PCS command: accepted
+- Miner command: accepted
+- Safety gate: passed
+- Telemetry feedback: updated
+- Audit persistence: confirmed
+- Artifact: `reports/virtual_site_hil_latest.json`
 
 ## 1. Forecasting Ensemble
 
@@ -116,6 +126,6 @@ Current status:
 
 Next implementation target:
 
-- Add a read-only shadow-mode telemetry adapter for PCS, meter, miner, breaker, tariff, and alarm streams.
-- Add signed dry-run command output for PCS/miner recommendations.
+- Connect live-read vendor drivers to the implemented read-only telemetry adapter layer for PCS, meter, miner, breaker, transformer, feeder, tariff, and alarm streams.
+- Add cryptographically signed dry-run command output for PCS/miner recommendations.
 - Run a 30-day replay benchmark using fixture data before any staged control activation.
