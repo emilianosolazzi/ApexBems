@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ApexBEMS — Architecture Specification</title>
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #0d1117;
+      --ink-soft: #2d3748;
+      --ink-faint: #4a5568;
+      --rule: #d1d9e0;
+      --accent: #0a2342;
+      --accent-mid: #1a4a7a;
+      --accent-light: #e8f0fb;
+      --gold: #b8860b;
+      --gold-light: #fdf6e3;
+      --mono: 'JetBrains Mono', 'Fira Mono', 'Courier New', monospace;
+      --sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+      --serif: 'Georgia', 'Times New Roman', serif;
+      --page-w: 860px;
+    }
+
+    html { font-size: 16px; background: #f4f6f9; }
+
+    body {
+      font-family: var(--serif);
+      color: var(--ink);
+      line-height: 1.75;
+      background: #f4f6f9;
+    }
+
+    /* ── Page Shell ───────────────────────────────────────── */
+    .page-wrap {
+      max-width: var(--page-w);
+      margin: 40px auto;
+      background: #ffffff;
+      border: 1px solid var(--rule);
+      box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+    }
+
+    /* ── Cover ────────────────────────────────────────────── */
+    .cover {
+      background: var(--accent);
+      padding: 72px 80px 56px;
+      color: #ffffff;
+      position: relative;
+      overflow: hidden;
+    }
+    .cover::before {
+      content: '';
+      position: absolute;
+      top: -120px; right: -120px;
+      width: 520px; height: 520px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .cover::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -60px;
+      width: 340px; height: 340px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.03);
+    }
+    .cover-logo {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 40px;
+    }
+    .cover-wordmark {
+      font-family: var(--sans);
+      font-size: 52px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      color: #ffffff;
+      line-height: 1.1;
+    }
+    .cover-wordmark span {
+      color: #7eb8f7;
+    }
+    .cover-subtitle {
+      font-family: var(--sans);
+      font-size: 17px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.75);
+      margin-top: 16px;
+      max-width: 520px;
+      line-height: 1.5;
+    }
+    .cover-rule {
+      width: 60px; height: 3px;
+      background: #7eb8f7;
+      margin: 36px 0;
+    }
+    .cover-meta {
+      font-family: var(--sans);
+      font-size: 12px;
+      color: rgba(255,255,255,0.50);
+      display: grid;
+      grid-template-columns: repeat(3, auto);
+      gap: 0 40px;
+      width: fit-content;
+    }
+    .cover-meta dt {
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      font-size: 10px;
+      margin-bottom: 2px;
+    }
+    .cover-meta dd { color: rgba(255,255,255,0.70); }
+
+    /* ── Abstract Band ────────────────────────────────────── */
+    .abstract-band {
+      background: var(--accent-light);
+      border-left: 4px solid var(--accent-mid);
+      padding: 36px 80px;
+    }
+    .abstract-label {
+      font-family: var(--sans);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--accent-mid);
+      margin-bottom: 12px;
+    }
+    .abstract-band p {
+      font-size: 14.5px;
+      color: var(--ink-soft);
+      max-width: 700px;
+      line-height: 1.8;
+    }
+
+    /* ── Body Content ─────────────────────────────────────── */
+    .body-content {
+      padding: 56px 80px 72px;
+    }
+
+    /* ── Section headings ─────────────────────────────────── */
+    h2 {
+      font-family: var(--sans);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 52px;
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--rule);
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+    }
+    h2 .sec-num {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--accent-mid);
+      background: var(--accent-light);
+      padding: 2px 8px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    h3 {
+      font-family: var(--sans);
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--ink-soft);
+      margin-top: 32px;
+      margin-bottom: 12px;
+      letter-spacing: 0.2px;
+    }
+    h3 .sub-num {
+      color: var(--accent-mid);
+      margin-right: 4px;
+    }
+
+    /* ── Body text ────────────────────────────────────────── */
+    p {
+      font-size: 14.5px;
+      color: var(--ink-soft);
+      margin-bottom: 16px;
+      max-width: 700px;
+    }
+
+    /* ── Architecture diagram ─────────────────────────────── */
+    .arch-diagram {
+      background: #0d1117;
+      border-radius: 8px;
+      padding: 32px 36px;
+      margin: 28px 0;
+      overflow-x: auto;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .arch-diagram pre {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #e2e8f0;
+      line-height: 1.65;
+      white-space: pre;
+    }
+
+    /* ── Audit flow diagram ───────────────────────────────── */
+    .audit-diagram {
+      background: #f8fafc;
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 28px 32px;
+      margin: 28px 0;
+      overflow-x: auto;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .audit-diagram pre {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--ink-soft);
+      line-height: 1.65;
+    }
+
+    /* ── Self-contained math ──────────────────────────────── */
+    /*
+      All math is rendered as styled HTML using Unicode math characters
+      and CSS. No external CDN required — fully self-contained.
+    */
+    .math-block {
+      background: var(--gold-light);
+      border: 1px solid #e8d5a0;
+      border-left: 4px solid var(--gold);
+      border-radius: 0 6px 6px 0;
+      padding: 20px 28px;
+      margin: 24px 0;
+      overflow-x: auto;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .math-block .math-label {
+      font-family: var(--sans);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+    .math-block .math-note {
+      font-size: 12.5px;
+      color: var(--ink-faint);
+      margin-top: 14px;
+      font-family: var(--serif);
+      font-style: italic;
+      line-height: 1.6;
+    }
+    /* Math expression container */
+    .mex {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: 15.5px;
+      color: var(--ink);
+      line-height: 2.2;
+      display: block;
+      padding: 4px 0;
+    }
+    .mex + .mex { margin-top: 6px; }
+    /* Fraction */
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      margin: 0 3px;
+      gap: 1px;
+    }
+    .frac .num, .frac .den {
+      display: block;
+      text-align: center;
+      font-size: 0.82em;
+      padding: 0 4px;
+    }
+    .frac .num { border-bottom: 1px solid var(--ink); }
+    /* Sub / sup */
+    .msub { font-size: 0.72em; vertical-align: sub; }
+    .msup { font-size: 0.72em; vertical-align: super; }
+    /* Italic variables */
+    .mv { font-style: italic; }
+    /* Greek */
+    .greek { font-family: 'Georgia', serif; font-style: italic; }
+    /* Piecewise / cases */
+    .cases-wrap {
+      display: inline-flex;
+      align-items: stretch;
+      gap: 10px;
+      vertical-align: middle;
+    }
+    .cases-brace {
+      font-size: 3em;
+      line-height: 1;
+      font-weight: 100;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+    }
+    .cases-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      justify-content: center;
+    }
+    .cases-row {
+      display: flex;
+      gap: 18px;
+      align-items: baseline;
+      font-size: 14.5px;
+    }
+    .cases-cond {
+      color: var(--ink-faint);
+      font-style: italic;
+      font-size: 0.90em;
+      min-width: 220px;
+    }
+
+    /* ── Code blocks ──────────────────────────────────────── */
+    .code-block {
+      background: #1a1a2e;
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin: 20px 0;
+      overflow-x: auto;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .code-block pre {
+      font-family: var(--mono);
+      font-size: 12.5px;
+      color: #abb2bf;
+      line-height: 1.7;
+    }
+    .code-block .kw { color: #c678dd; }
+    .code-block .fn { color: #61afef; }
+    .code-block .st { color: #98c379; }
+    .code-block .cm { color: #5c6370; font-style: italic; }
+    .code-block .nm { color: #d19a66; }
+
+    /* ── Bullet lists ─────────────────────────────────────── */
+    ul.content-list {
+      margin: 16px 0 20px 0;
+      padding-left: 20px;
+      max-width: 700px;
+    }
+    ul.content-list li {
+      font-size: 14.5px;
+      color: var(--ink-soft);
+      margin-bottom: 10px;
+      line-height: 1.7;
+    }
+    ul.content-list li strong {
+      color: var(--ink);
+    }
+
+    /* ── Scenario table ───────────────────────────────────── */
+    .scenario-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 28px 0;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .scenario-card {
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      overflow: hidden;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .scenario-header {
+      background: var(--accent);
+      color: #fff;
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 12px 20px;
+    }
+    .scenario-header .scenario-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 2px;
+    }
+    .scenario-body {
+      padding: 18px 20px;
+    }
+    .scenario-row {
+      font-family: var(--sans);
+      font-size: 12.5px;
+      color: var(--ink-soft);
+      margin-bottom: 8px;
+      display: flex;
+      gap: 8px;
+    }
+    .scenario-row strong {
+      color: var(--ink);
+      min-width: 110px;
+      flex-shrink: 0;
+    }
+    .badge {
+      display: inline-block;
+      font-family: var(--sans);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 3px;
+    }
+    .badge-green  { background: #d1fae5; color: #065f46; }
+    .badge-amber  { background: #fef3c7; color: #92400e; }
+
+    /* ── Info callout ─────────────────────────────────────── */
+    .callout {
+      display: flex;
+      gap: 16px;
+      background: var(--accent-light);
+      border: 1px solid #bdd4f0;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin: 24px 0;
+      max-width: 700px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .callout-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .callout p { font-size: 13.5px; margin-bottom: 0; }
+
+    /* ── Key terms ────────────────────────────────────────── */
+    .term-grid {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 0;
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 24px 0;
+      max-width: 700px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .term-row { display: contents; }
+    .term-row:not(:last-child) .term-key,
+    .term-row:not(:last-child) .term-val {
+      border-bottom: 1px solid var(--rule);
+    }
+    .term-key {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-mid);
+      background: #f8fafc;
+      padding: 14px 18px;
+    }
+    .term-val {
+      font-size: 13px;
+      color: var(--ink-soft);
+      padding: 14px 18px;
+      line-height: 1.6;
+    }
+
+    /* ── Conclusion band ──────────────────────────────────── */
+    .conclusion-band {
+      background: var(--accent);
+      color: #fff;
+      padding: 40px 80px;
+      margin-top: 48px;
+    }
+    .conclusion-band h2 {
+      color: #fff;
+      border-bottom-color: rgba(255,255,255,0.2);
+      font-size: 18px;
+      margin-top: 0;
+    }
+    .conclusion-band h2 .sec-num {
+      background: rgba(255,255,255,0.15);
+      color: #7eb8f7;
+    }
+    .conclusion-band p { color: rgba(255,255,255,0.80); max-width: 660px; }
+
+    /* ── Footer ───────────────────────────────────────────── */
+    .doc-footer {
+      background: #0a1628;
+      color: rgba(255,255,255,0.40);
+      padding: 24px 80px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--sans);
+      font-size: 11px;
+    }
+
+    /* ── Print styles ─────────────────────────────────────── */
+    @media print {
+      html { background: #fff; font-size: 13px; }
+      body { background: #fff; }
+      .page-wrap {
+        margin: 0;
+        max-width: 100%;
+        box-shadow: none;
+        border: none;
+      }
+      .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .cover::before, .cover::after { display: none; }
+      .abstract-band { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .arch-diagram  { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .conclusion-band { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .doc-footer { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      h2 { page-break-after: avoid; break-after: avoid; }
+      h3 { page-break-after: avoid; break-after: avoid; }
+      p  { orphans: 3; widows: 3; }
+      .arch-diagram,
+      .audit-diagram,
+      .math-block,
+      .code-block,
+      .callout,
+      .scenario-card,
+      .scenario-grid,
+      .term-grid {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+    }
+
+    /* ── Responsive ───────────────────────────────────────── */
+    @media (max-width: 700px) {
+      .cover { padding: 40px 28px 36px; }
+      .cover-wordmark { font-size: 36px; }
+      .cover-meta { grid-template-columns: 1fr; gap: 12px; }
+      .abstract-band { padding: 28px 28px; }
+      .body-content { padding: 36px 28px 48px; }
+      .conclusion-band { padding: 36px 28px; }
+      .doc-footer { padding: 20px 28px; flex-direction: column; gap: 8px; text-align: center; }
+      .scenario-grid { grid-template-columns: 1fr; }
+      .term-grid { grid-template-columns: 1fr; }
+      .term-key { border-bottom: none; }
+      .cases-cond { min-width: 160px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <!-- ══ COVER ══════════════════════════════════════════════ -->
+  <header class="cover" role="banner">
+    <div class="cover-logo">ApexBEMS Engineering Group &nbsp;·&nbsp; Technical Publication</div>
+    <h1 class="cover-wordmark">Apex<span>BEMS</span></h1>
+    <div class="cover-subtitle">
+      A Framework for Verifiable Energy-Compute Arbitrage<br>and Multi-Layer Safety Routing
+    </div>
+    <div class="cover-rule" aria-hidden="true"></div>
+    <dl class="cover-meta">
+      <div><dt>Author</dt><dd>ApexBEMS Engineering Group</dd></div>
+      <div><dt>Date</dt><dd>July 2026</dd></div>
+      <div><dt>Status</dt><dd>Architecture Specification</dd></div>
+    </dl>
+  </header>
+
+  <!-- ══ ABSTRACT ═══════════════════════════════════════════ -->
+  <section aria-labelledby="abstract-label">
+    <div class="abstract-band">
+      <div class="abstract-label" id="abstract-label">Abstract</div>
+      <p>
+        This paper introduces <strong>ApexBEMS</strong>, a high-performance, hybrid edge-to-cloud Battery Energy Management System (BEMS) designed to co-optimize physical grid interactions, electrochemical energy storage, and high-density computing loads (ASIC Bitcoin mining). We detail an infrastructure-as-code architecture that resolves the systemic conflict between continuous financial optimization and physical microgrid safety.
+      </p>
+      <p style="margin-top:14px; margin-bottom:0;">
+        By introducing a zero-trust multi-layer data firewall (<code>contracts.py</code>), a deterministic Hardware-in-the-Loop (HIL) digital twin simulator (<code>virtual_site.py</code>), and a strict cryptographic audit trail, ApexBEMS allows institutional operators to safely expose heavy electrical machinery to high-velocity, proprietary trading and dispatch algorithms without risking hardware degradation, state desynchronization, or grid compliance failures.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══ BODY ════════════════════════════════════════════════ -->
+  <main class="body-content">
+
+    <!-- § 1 ─────────────────────────────────────────────── -->
+    <section aria-labelledby="sec1">
+      <h2 id="sec1"><span class="sec-num" aria-hidden="true">§ 1</span> Introduction &amp; Market Context</h2>
+      <p>
+        The integration of Energy Storage Systems (BESS) with variable computing loads represents the next evolution of grid-scale demand response. Bitcoin mining infrastructure serves as a highly unique thermodynamic asset: a purely digital load capable of near-instantaneous curtailment, functioning effectively as a <em>"synthetic battery."</em>
+      </p>
+      <p>
+        However, co-locating a physical BESS — highly sensitive to non-linear degradation, thermal boundaries, and strict state-of-charge limits — with an ASIC mining fleet introduces severe operational vulnerabilities. This paper presents ApexBEMS as a structured solution to these co-location challenges.
+      </p>
+
+      <h3 id="sec1-1"><span class="sub-num">1.1</span> The Incumbent Asymmetry</h3>
+      <p>
+        Current market infrastructure is highly fragmented across two incompatible planes of operation:
+      </p>
+      <div class="term-grid" role="table" aria-label="Incumbent system comparison">
+        <div class="term-row" role="row">
+          <div class="term-key" role="rowheader">Industrial Controllers<br><small style="font-weight:400;color:#888;">(e.g., SEL)</small></div>
+          <div class="term-val" role="cell">Exceptional at maintaining low-level physical safety, electrical frequency stability, and breaker protection. However, they are <strong>rigid, closed-box systems</strong> incapable of parsing real-time hashprice, block subsidy dynamics, or wholesale day-ahead/real-time market volatility.</div>
+        </div>
+        <div class="term-row" role="row">
+          <div class="term-key" role="rowheader">Mining Fleet Optimizers<br><small style="font-weight:400;color:#888;">(e.g., Braiins, LōD)</small></div>
+          <div class="term-val" role="cell">Optimized for chip-level tuning and pool orchestration. However, they <strong>lack formal semantic validation</strong> of electrical parameters, treating grid and battery assets as linear abstractions — frequently leading to over-allocation or accelerated battery wear.</div>
+        </div>
+      </div>
+      <p>
+        ApexBEMS eliminates this asymmetry by decoupling the <strong>Optimization Plane</strong> (the algorithmic "brain") from the <strong>Execution Envelope</strong> (the hardware "guard").
+      </p>
+    </section>
+
+    <!-- § 2 ─────────────────────────────────────────────── -->
+    <section aria-labelledby="sec2">
+      <h2 id="sec2"><span class="sec-num" aria-hidden="true">§ 2</span> System Architecture &amp; Topology</h2>
+      <p>
+        ApexBEMS implements a strict hybrid edge-to-cloud architecture designed to guarantee site survivability during network partition events. The architecture enforces a unidirectional trust boundary: all external intelligence must be translated through the edge firewall before any hardware command is issued.
+      </p>
+
+      <div class="arch-diagram" role="img" aria-label="ApexBEMS system architecture diagram">
+        <pre>  [ External Market Ingress ]         [ Proprietary Quant Models ]
+           ISO LMP / Ancillary                  ML Dispatch Engine
+                     │                                │
+                     ▼                                ▼
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                   ApexBEMS Cloud Plane                          │
+  │   ─ Data Normalization Engine  (MWh ──→ kWh standardization)   │
+  │   ─ Multi-Scenario Linear Programming Dispatch Modeling         │
+  │   ─ ISO Real-Time LMP Feed  /  Bitcoin Network State Params     │
+  └───────────────────────┬─────────────────────────────────────────┘
+                           │  Secure API (JSON-Schema Draft 2020-12)
+                           ▼
+  ┌─────────────────────────────────────────────────────────────────┐
+  │                   ApexBEMS Edge Firewall                        │
+  │   ─ Structural & Semantic Contract Validation  (contracts.py)  │
+  │   ─ Real-Time Physics Safety Envelope           (safety.py)    │
+  │   ─ Cryptographic Audit Trail                   (audit.py)     │
+  └───────────────────────┬─────────────────────────────────────────┘
+                           │  Industrial Protocol (Modbus/TCP · DNP3 · CAN bus)
+                           ▼
+               [ Physical Site Infrastructure ]
+               BESS Inverters · ASIC Mining Racks · Facility Controls</pre>
+      </div>
+
+      <h3 id="sec2-1"><span class="sub-num">2.1</span> The Cloud Optimization Plane</h3>
+      <p>
+        The cloud layer manages the continuous ingestion of high-velocity external data feeds: ISO real-time locational marginal pricing (LMP), ancillary service dispatch targets, and Bitcoin network state parameters (difficulty, mempool density, and spot price). This layer runs multi-scenario linear programming loops to generate optimal dispatch recommendations expressed as structured JSON payloads.
+      </p>
+
+      <h3 id="sec2-2"><span class="sub-num">2.2</span> The Edge Execution Envelope</h3>
+      <p>
+        The Edge Controller is a lightweight, hardened software daemon running on an on-site Industrial PC (IPC). It exposes standard API endpoints to the Cloud Plane but processes all incoming commands through a zero-trust validation pipeline. The Edge Controller communicates natively with physical assets via industrial protocols including Modbus/TCP, DNP3, or native CAN bus — protocols with proven deterministic latency characteristics appropriate for real-time electrical control.
+      </p>
+    </section>
+
+    <!-- § 3 ─────────────────────────────────────────────── -->
+    <section aria-labelledby="sec3">
+      <h2 id="sec3"><span class="sec-num" aria-hidden="true">§ 3</span> The Multi-Layer Data Firewall (<code>contracts.py</code>)</h2>
+      <p>
+        Every dispatch plan transmitted from the cloud optimizer to the physical site must pass through a strict structural and semantic firewall before it is translated into hardware-level commands. This firewall operates as an independent software process with no direct hardware write access — it can only <em>approve</em>, <em>transform</em>, or <em>reject</em> commands.
+      </p>
+
+      <h3 id="sec3-1"><span class="sub-num">3.1</span> Structural Ingress Validation</h3>
+      <p>
+        ApexBEMS leverages <strong>JSON Schema (Draft 2020-12)</strong> to enforce rigorous data types at the API ingress boundary. The firewall strictly prohibits non-finite floats, boolean injection into numeric fields, or structural deviations. Any malformed payload is instantly dropped at the edge, preventing corruption of the local hardware driver state machine.
+      </p>
+
+      <div class="code-block" role="region" aria-label="Structural Ingress Validator source excerpt">
+        <pre><span class="cm"># contracts.py — Structural Ingress Validator (excerpt)</span>
+<span class="kw">import</span> jsonschema, math
+
+DISPATCH_SCHEMA = {
+    <span class="st">"$schema"</span>: <span class="st">"https://json-schema.org/draft/2020-12/schema"</span>,
+    <span class="st">"type"</span>: <span class="st">"object"</span>,
+    <span class="st">"required"</span>: [<span class="st">"bess_power_kw"</span>, <span class="st">"miner_power_kw"</span>, <span class="st">"unit_basis"</span>],
+    <span class="st">"properties"</span>: {
+        <span class="st">"bess_power_kw"</span>:  {<span class="st">"type"</span>: <span class="st">"number"</span>, <span class="st">"minimum"</span>: <span class="nm">-5000</span>, <span class="st">"maximum"</span>: <span class="nm">5000</span>},
+        <span class="st">"miner_power_kw"</span>: {<span class="st">"type"</span>: <span class="st">"number"</span>, <span class="st">"minimum"</span>: <span class="nm">0</span>,     <span class="st">"maximum"</span>: <span class="nm">5000</span>},
+        <span class="st">"unit_basis"</span>:     {<span class="st">"type"</span>: <span class="st">"string"</span>, <span class="st">"enum"</span>: [<span class="st">"kW"</span>, <span class="st">"MW"</span>]},
+        <span class="st">"capacity_kwh"</span>:   {<span class="st">"type"</span>: <span class="st">"number"</span>, <span class="st">"exclusiveMinimum"</span>: <span class="nm">0</span>}
+    },
+    <span class="st">"additionalProperties"</span>: <span class="kw">False</span>
+}
+
+<span class="kw">def</span> <span class="fn">validate_dispatch</span>(payload: dict) -&gt; dict:
+    jsonschema.<span class="fn">validate</span>(payload, DISPATCH_SCHEMA)          <span class="cm"># structural check</span>
+    <span class="kw">for</span> field, val <span class="kw">in</span> payload.<span class="fn">items</span>():
+        <span class="kw">if</span> <span class="fn">isinstance</span>(val, float) <span class="kw">and not</span> math.<span class="fn">isfinite</span>(val):
+            <span class="kw">raise</span> <span class="fn">ValueError</span>(<span class="st">f"Non-finite value in field '{field}': {val}"</span>)
+    <span class="kw">return</span> <span class="fn">_normalize_units</span>(payload)                        <span class="cm"># semantic normalization</span></pre>
+      </div>
+
+      <h3 id="sec3-2"><span class="sub-num">3.2</span> Semantic and Unit Standardization</h3>
+      <p>
+        A critical point of failure in multi-commodity optimization is <strong>unit cross-pollination</strong> — executing a command calculated in USD/MWh against a system structured in USD/kWh produces a 1,000× magnitude error in dispatch sizing. <code>contracts.py</code> structurally enforces normalization at ingress:
+      </p>
+
+      <div class="math-block" role="region" aria-label="Unit Normalization Transform formula">
+        <div class="math-label">Unit Normalization Transform</div>
+        <span class="mex">
+          <span class="mv">P</span><sub class="msub">kW</sub>
+          &nbsp;=&nbsp;
+          <span class="cases-wrap">
+            <span class="cases-brace" aria-hidden="true">{</span>
+            <span class="cases-rows">
+              <span class="cases-row">
+                <span><span class="mv">P</span><sub class="msub">raw</sub></span>
+                <span class="cases-cond">if <code>unit_basis</code> = <code>"kW"</code></span>
+              </span>
+              <span class="cases-row">
+                <span><span class="mv">P</span><sub class="msub">raw</sub> &times; 1000</span>
+                <span class="cases-cond">if <code>unit_basis</code> = <code>"MW"</code></span>
+              </span>
+            </span>
+          </span>
+        </span>
+        <p class="math-note">
+          If an incoming payload fails to explicitly define its conversion state, or attempts to pass a negative capacity value, the edge layer intercepts and rejects the command.
+        </p>
+      </div>
+
+      <div class="callout" role="note">
+        <div class="callout-icon" aria-hidden="true">🔒</div>
+        <p>
+          <strong>Zero-Trust Guarantee:</strong> The edge firewall treats every incoming payload as potentially malicious regardless of source. Cloud optimizer outputs, third-party model integrations, and internal tools all pass through identical validation. The physical hardware bus is never exposed to unvalidated instructions under any operational condition.
+        </p>
+      </div>
+    </section>
+
+    <!-- § 4 ─────────────────────────────────────────────── -->
+    <section aria-labelledby="sec4">
+      <h2 id="sec4"><span class="sec-num" aria-hidden="true">§ 4</span> Hardware-in-the-Loop Simulation (<code>virtual_site.py</code>)</h2>
+      <p>
+        To achieve continuous integration and proofing of command contracts without incurring mechanical wear on physical assets, ApexBEMS includes a native digital twin framework. The HIL simulator is deterministic and runs at configurable timesteps, making it suitable for both rapid prototyping and formal certification testing.
+      </p>
+
+      <h3 id="sec4-1"><span class="sub-num">4.1</span> Non-Linear Hardware Modeling</h3>
+      <p>
+        Unlike naive simulations that assume perfect command adherence, the ApexBEMS HIL environment enforces physical constraints on all control loops. Miner hashrate output is modeled as a direct function of applied power and chip efficiency:
+      </p>
+
+      <div class="math-block" role="region" aria-label="Hashrate production model formula">
+        <div class="math-label">Hashrate Production Model</div>
+        <span class="mex">
+          <span class="mv">H</span>(<span class="mv">P</span><sub class="msub">applied</sub>)
+          &nbsp;=&nbsp;
+          <span class="greek">&#951;</span>
+          &nbsp;&middot;&nbsp;
+          <span class="mv">P</span><sub class="msub">applied</sub>
+          &nbsp;&nbsp;<span style="color:var(--ink-faint); font-size:0.85em;">[TH/s]</span>
+        </span>
+        <p class="math-note">
+          where <span class="greek" style="font-size:1em;">&#951;</span> is the ASIC chip efficiency coefficient (TH/s per kW), measured under current thermal operating conditions and clock frequency.
+        </p>
+      </div>
+
+      <p>
+        The HIL environment also accounts for non-linear state-of-charge transitions based on the simulation timestep variable <em>dt</em>, preventing the accumulation of rounding errors or the omission of inverter ramp latencies from the energy balance:
+      </p>
+
+      <div class="math-block" role="region" aria-label="State-of-charge integration formula">
+        <div class="math-label">State-of-Charge Integration</div>
+        <span class="mex">
+          SoC<sub class="msub"><em>t</em>+1</sub>
+          &nbsp;=&nbsp;
+          SoC<sub class="msub"><em>t</em></sub>
+          &nbsp;+&nbsp;
+          <span class="frac">
+            <span class="num"><span class="mv">P</span><sub class="msub">BESS</sub> &middot; <em>dt</em></span>
+            <span class="den"><span class="mv">E</span><sub class="msub">nominal</sub></span>
+          </span>
+          &nbsp;&middot;&nbsp;
+          <span class="greek">&#951;</span><sub class="msub">roundtrip</sub>
+        </span>
+        <p class="math-note">
+          where <span class="mv">E</span><sub class="msub">nominal</sub> is the rated capacity (kWh) and
+          <span class="greek">&#951;</span><sub class="msub">roundtrip</sub> &isin; (0,&nbsp;1] is the cell round-trip efficiency factor.
+        </p>
+      </div>
+
+      <h3 id="sec4-2"><span class="sub-num">4.2</span> Comprehensive Site Load Mathematics</h3>
+      <p>
+        The HIL environment models the entire electrical envelope of the facility. True grid import <span class="mv">P</span><sub class="msub">grid</sub> is calculated by synthesizing all asset states alongside baseline facility parasitic overhead:
+      </p>
+
+      <div class="math-block" role="region" aria-label="Site grid import equation">
+        <div class="math-label">Site Grid Import Equation</div>
+        <span class="mex">
+          <span class="mv">P</span><sub class="msub">grid</sub>
+          &nbsp;=&nbsp;
+          <span class="mv">P</span><sub class="msub">miners</sub>
+          &nbsp;+&nbsp;
+          <span class="mv">P</span><sub class="msub">HVAC</sub>
+          &nbsp;+&nbsp;
+          <span class="mv">P</span><sub class="msub">parasitic</sub>
+          &nbsp;&minus;&nbsp;
+          <span class="mv">P</span><sub class="msub">BESS,discharge</sub>
+        </span>
+        <p class="math-note">
+          This rigorous accounting prevents the generation of optimization strategies that appear viable in pure financial models but would trip physical facility-level overcurrent relays in deployment.
+        </p>
+      </div>
+    </section>
+
+    <!-- § 5 ─────────────────────────────────────────────── -->
+    <section aria-labelledby="sec5">
+      <h2 id="sec5"><span class="sec-num" aria-hidden="true">§ 5</span> Cryptographic Provenance and Auditability</h2>
+      <p>
+        For institutional deployment, operational transparency is as critical as physical safety. ApexBEMS creates a deterministic, cryptographically bound audit loop for every system clock cycle, enabling post-hoc forensic analysis and regulatory compliance reporting.
+      </p>
+
+      <div class="audit-diagram" role="img" aria-label="Cryptographic audit chain diagram">
+        <pre>
+  ┌───────────────────────────────────┐
+  │   Telemetry State Snapshot (t)    │ ─── SHA-256 ──→  source_snapshot_hash
+  │   SoC, P_grid, T_cell, hashrate   │
+  └───────────────────────────────────┘
+                    │
+                    ▼
+  ┌───────────────────────────────────┐
+  │   Dispatch Decision Payload       │ ─── SHA-256 ──→  decision_hash
+  │   bess_power_kw, miner_power_kw   │
+  └───────────────────────────────────┘
+                    │
+                    ▼
+  ┌───────────────────────────────────────────────────────────────────┐
+  │   Signed Audit Log Entry                                          │
+  │   { ts, source_snapshot_hash, decision_hash, execution_status }  │
+  └────────────────────────────────────┬──────────────────────────────┘
+                                       │
+                                       ▼
+                              [ Immutable Append-Only DB ]</pre>
+      </div>
+
+      <ul class="content-list">
+        <li><strong>source_snapshot_hash</strong> — A deterministic SHA-256 hash generated from the normalized, immutable state of all physical site telemetry at time <em>t</em>. Guarantees that the telemetry state feeding the optimizer is cryptographically sealed and unmodifiable ex-post.</li>
+        <li><strong>decision_hash</strong> — A cryptographic hash computed directly from the optimization plan's output fields prior to execution, enabling verification that no post-generation mutation occurred.</li>
+      </ul>
+
+      <p>
+        By pairing the <code>source_snapshot_hash</code> and the <code>decision_hash</code> inside every executed command, ApexBEMS creates an unbreakable chain of custody. If a utility or grid operator disputes a demand-response curtailment event, the operator possesses mathematical proof demonstrating exactly what telemetry state the system observed, what the optimizer recommended, and precisely how the hardware responded.
+      </p>
+    </section>
+
+    <!-- § 6 ─────────────────────────────────────────────── -->
+    <section aria-labelledby="sec6">
+      <h2 id="sec6"><span class="sec-num" aria-hidden="true">§ 6</span> Financial Economics &amp; Co-Optimization Theory</h2>
+      <p>
+        The objective function of ApexBEMS is designed to maximize net site yield <em>Y</em><sub class="msub">net</sub> across two volatile, partially correlated commodities: electric grid capacity and cryptographic hashpower.
+      </p>
+
+      <h3 id="sec6-1"><span class="sub-num">6.1</span> The Economic Equilibrium Equation</h3>
+      <p>
+        At any given dispatch interval, the system evaluates the <strong>Mining Revenue Floor</strong> <span class="mv">R</span><sub class="msub">mine</sub> against the <strong>Real-Time Grid Premium</strong> <span class="mv">P</span><sub class="msub">grid</sub>. Net yield is maximized by routing to the higher-margin commodity:
+      </p>
+
+      <div class="math-block" role="region" aria-label="Net yield maximization formula">
+        <div class="math-label">Net Yield Maximization</div>
+        <span class="mex">
+          <span class="mv">Y</span><sub class="msub">net</sub>
+          &nbsp;=&nbsp;
+          max&thinsp;(
+          &thinsp;<span class="mv">R</span><sub class="msub">mine</sub>(<span class="mv">H</span>,&thinsp;BTC/USD)&thinsp;,
+          &ensp;<span class="mv">P</span><sub class="msub">grid</sub>(<span class="mv">C</span><sub class="msub">electricity</sub>)
+          &middot;&thinsp;<span class="mv">E</span><sub class="msub">dispatch</sub>
+          &thinsp;)
+        </span>
+      </div>
+
+      <div class="math-block" role="region" aria-label="Dynamic routing condition formula">
+        <div class="math-label">Dynamic Routing Condition</div>
+        <span class="mex">
+          Route&nbsp;=&nbsp;
+          <span class="cases-wrap">
+            <span class="cases-brace" aria-hidden="true">{</span>
+            <span class="cases-rows">
+              <span class="cases-row">
+                <span>Mine</span>
+                <span class="cases-cond">if <span class="mv">R</span><sub class="msub">mine</sub> &ge; <span class="mv">C</span><sub class="msub">electricity</sub> &middot; <span class="mv">P</span><sub class="msub">rated</sub></span>
+              </span>
+              <span class="cases-row">
+                <span>Grid Dispatch</span>
+                <span class="cases-cond">if <span class="mv">C</span><sub class="msub">electricity</sub> &gt; <span class="frac" style="vertical-align:middle;"><span class="num"><span class="mv">R</span><sub class="msub">mine</sub></span><span class="den"><span class="mv">P</span><sub class="msub">rated</sub></span></span></span>
+              </span>
+            </span>
+          </span>
+        </span>
+        <p class="math-note">
+          where <span class="mv">C</span><sub class="msub">electricity</sub> is the real-time spot price (USD/MWh) and <span class="mv">P</span><sub class="msub">rated</sub> is the site rated load (MW).
+        </p>
+      </div>
+
+      <h3 id="sec6-2"><span class="sub-num">6.2</span> Operational Matrices — 1 MW Reference Installation</h3>
+      <p>
+        Evaluating a 1 MW installation operating under representative grid volatility yields two canonical automated behavioral modes:
+      </p>
+
+      <div class="scenario-grid" role="region" aria-label="Operational scenario comparison">
+        <div class="scenario-card">
+          <div class="scenario-header">
+            <div class="scenario-label">Scenario A</div>
+            Energy Abundance — Midday Solar Peak
+          </div>
+          <div class="scenario-body">
+            <div class="scenario-row"><strong>Grid Pricing</strong> $0.00 – $10.00 / MWh</div>
+            <div class="scenario-row"><strong>BESS Action</strong> Charging at maximum rate</div>
+            <div class="scenario-row"><strong>Miner Action</strong> 100% capacity utilization</div>
+            <div class="scenario-row"><strong>Net Margin</strong> <span class="badge badge-green">&gt; $70.00 / MWh</span></div>
+            <div class="scenario-row" style="margin-top:8px;"><strong>SafetyGateway</strong> Confirms nominal operating temperatures before dispatch</div>
+          </div>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-header">
+            <div class="scenario-label">Scenario B</div>
+            Grid Stress — Evening Peak / Ancillary Call
+          </div>
+          <div class="scenario-body">
+            <div class="scenario-row"><strong>Grid Pricing</strong> $250.00+ / MWh</div>
+            <div class="scenario-row"><strong>BESS Action</strong> Maximum discharge mode</div>
+            <div class="scenario-row"><strong>Miner Action</strong> <span class="badge badge-amber">Curtailed to 0 kW</span></div>
+            <div class="scenario-row"><strong>Response Time</strong> &lt; 100 ms curtailment latency</div>
+            <div class="scenario-row" style="margin-top:8px;"><strong>Outcome</strong> Avoids peak consumption cost; harvests grid arbitrage premium</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- § 7 ─────────────────────────────────────────────── -->
+    <section aria-labelledby="sec7">
+      <h2 id="sec7"><span class="sec-num" aria-hidden="true">§ 7</span> The Zero-Trust Enterprise Integration Model</h2>
+      <p>
+        ApexBEMS is explicitly engineered as an institutional <strong>Execution and Protection Layer</strong>, not a black-box algorithmic asset manager. This design philosophy enables institutional adoption without requiring operators to cede intellectual property or operational authority.
+      </p>
+
+      <h3 id="sec7-1"><span class="sub-num">7.1</span> Separation of Concerns</h3>
+      <p>
+        Quant trading desks, energy hedge funds, and infrastructure operators retain <strong>absolute custody</strong> of their proprietary machine learning and predictive optimization models. Clients do not upload intellectual property to ApexBEMS. Instead, their cloud models transmit structured recommendations to ApexBEMS edge endpoints — ApexBEMS validates, enforces physical safety, and executes. The client's model IP remains exclusively within the client's own cloud infrastructure.
+      </p>
+
+      <h3 id="sec7-2"><span class="sub-num">7.2</span> Automated Safety Interception</h3>
+      <p>
+        If a client trading algorithm experiences a software fault and repeatedly requests maximum battery cycling that would violate cell thermal or state-of-charge limits, ApexBEMS does not crash or execute blindly. The deterministic safety response is:
+      </p>
+
+      <ul class="content-list">
+        <li><strong>Detect</strong> — The edge firewall identifies the contract infraction through physics safety envelope evaluation in <code>safety.py</code>.</li>
+        <li><strong>Log</strong> — The infraction and full payload are cryptographically sealed and appended to the immutable audit trail.</li>
+        <li><strong>Drop</strong> — The offending command is discarded without touching any hardware register.</li>
+        <li><strong>Hold</strong> — The system transitions to a pre-defined safe holding state, maintaining last-known-good asset configuration until the infraction is resolved.</li>
+        <li><strong>Alert</strong> — The operator and client receive an immediate notification with the infraction hash reference for forensic investigation.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <!-- ══ CONCLUSION ══════════════════════════════════════════ -->
+  <section aria-labelledby="sec8">
+    <div class="conclusion-band">
+      <h2 id="sec8"><span class="sec-num" aria-hidden="true">§ 8</span> Conclusion</h2>
+      <p>
+        ApexBEMS introduces structural validation, cryptographic grounding, and strict physical guardrails to the domain of heavy industrial energy-compute assets. By separating the financial optimization plane from the physical execution layer through a formally specified, zero-trust data firewall, it enables institutional capital to safely capture the volatile yield spreads between power grids and global cryptographic networks.
+      </p>
+      <p style="margin-top:16px;">
+        The three pillars of the ApexBEMS architecture — the multi-layer data firewall (<code>contracts.py</code>), the Hardware-in-the-Loop digital twin (<code>virtual_site.py</code>), and the cryptographic audit trail — collectively provide the resilient, verifiable infrastructure required to operate high-stakes, real-time energy arbitrage safely, transparently, and in full regulatory compliance.
+      </p>
+      <p style="margin-top:16px; font-style: italic; color: rgba(255,255,255,0.60); font-size:13.5px;">
+        For integration inquiries, technical due diligence requests, or to schedule a HIL simulation demonstration, contact the ApexBEMS Engineering Group.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══════════════════════════════════════════════ -->
+  <footer class="doc-footer" role="contentinfo">
+    <span>ApexBEMS — Architecture Specification</span>
+    <span>© 2026 ApexBEMS Engineering Group &nbsp;·&nbsp; CONFIDENTIAL</span>
+    <span>July 2026</span>
+  </footer>
+
+</div><!-- /page-wrap -->
+
+</body>
+</html>
